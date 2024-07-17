@@ -4,60 +4,88 @@ import { GiGps } from "react-icons/gi";
 import { MdNumbers } from "react-icons/md";
 import MapComponent from "../components/MapComponent";
 import axios from "axios";
-import { Select, Switch, message } from "antd";
-import { FaCalendar, FaTimes } from "react-icons/fa";
+import { FloatButton, Select, Switch, message } from "antd";
+import { FaCalendar, FaInfo, FaSave, FaTimes, FaUsers } from "react-icons/fa";
 import { BsBoundingBoxCircles } from "react-icons/bs";
 import Amenities from "../components/Amenities";
 import Modelos from "../components/Modelos";
-import dayjs from "dayjs";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import AmenitiesEdit from "../components/AmenitiesEdit";
 
 const EditPropiedad = () => {
   //useparams
   const { query } = useParams();
 
-  const navigate = useNavigate();
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const session = JSON.parse(sessionStorage.getItem("session"));
-  const mapRef = useRef();
-  const [position, setPosition] = useState([40.416775, -3.70379]); // Coordenadas por defecto (Madrid)
+  const mapRef = useRef(); // Coordenadas por defecto (Madrid)
   const [loadingCreate, setLoadingCreate] = useState(false);
   // estados de publicacion
   const [statusPublicacion, setStatusPublicacion] = useState("Borrador");
-  // ESTADOS DE DATOS BASICOS
-  const [nombrePropiedad, setNombrePropiedad] = useState("");
-  const [referencia, setReferencia] = useState("");
-  const [fechaCaptacion, setFechaCaptacion] = useState("");
-  const [fechaentrega, setFechaentrega] = useState("");
-  const [descripcionPropiedad, setDescripcionPropiedad] = useState("");
-  const [videoDescripcionPropiedad, setVideoDescripcionPropiedad] =
-    useState("");
+  // ESTADOS DE DATOS BASICOS propiedad
   const [propiedad, setPropiedad] = useState(null);
-  const [initialData, setInitialData] = useState([]);
+  const [initialData, setInitialData] = useState(null);
+  // ESTADOS DE DATOS BASICOS propiedad amenidades
+  const [amenidades, setAmenidades] = useState([]);
+  const [initialAmenidades, setInitialAmenidades] = useState([])
 
   useEffect(() => {
+    setLoadingCreate(true);
     const fetchPropiedad = async () => {
       try {
         const response = await axios.get(`${apiUrl}/propiedades/${query}`, {});
-        console.log(response);
-
+        console.log(response.data);
+        setLoadingCreate(false);
+        let data = response.data;
         setPropiedad(response.data);
         setInitialData(response.data);
+        let newAd = {
+          country: "Perú",
+          province: data?.region_name,
+          locality: data?.provincia_name,
+          zone: data?.distrito_name,
+          postalCode: data?.postalcode === null ? "" : data?.postalcode,
+          exactAddress: data?.exactAddress === null ? "" : data?.exactAddress,
+        };
+        setAddress(newAd);
       } catch (error) {
-        console.error("Error al obtener los departamentos:", error);
+        console.error("Error al obtener los datos de la propiedad:", error);
       }
     };
     fetchPropiedad();
-  }, []);
+  }, [apiUrl, query]);
+  useEffect(() => {
+    if(propiedad){
+      const fetchAmenidadesProperty = async () => {
+        try {
+          const response = await axios.get(`${apiUrl}/amenidadesbypropiedad/${query}`, {});
+          console.log(response.data);
+          setAmenidades(response.data);
+          setInitialAmenidades(response.data);
+        
+        } catch (error) {
+          console.error("Error al obtener las amenidades del proyecto:", error);
+        }
+      };
+      fetchAmenidadesProperty();
+    }
+  }, [apiUrl, query, propiedad]);
+
 
   function obtenerCodigoVideo(url) {
     console.log(url);
-    const match = url.match(
-      /(?:youtu\.be\/|youtube\.com\/(?:.*v\/|.*&v=|.*embed\/|.*be\/|.*watch\?v=))([^"&?\/\s]{11})/
-    );
-    console.log(match);
-    let videosrc = construirURLDeEmbed(match && match[1] ? match[1] : null);
+    if (url === undefined) {
+      return "";
+    } else {
+      const match = url.match(
+        /(?:youtu\.be\/|youtube\.com\/(?:.*v\/|.*&v=|.*embed\/|.*be\/|.*watch\?v=))([^"&?\/\s]{11})/
+      );
+      console.log(match);
+      let videosrc = construirURLDeEmbed(match && match[1] ? match[1] : null);
 
-    return videosrc;
+      return videosrc;
+    }
   }
 
   // Función para construir la URL de embed
@@ -69,13 +97,6 @@ const EditPropiedad = () => {
   const [localities, setLocalities] = useState([]);
   const [zones, setZones] = useState([]);
   // ESTADOS PARA EL DETALLE DE PROPIEDAD
-  const [etapaPropiedad, setEtapaPropiedad] = useState("En construccion");
-  const [linkExtra, setLinkExtra] = useState("");
-  const [financiamiento, setFinanciamiento] = useState(false);
-  const apiUrl = process.env.REACT_APP_API_URL;
-  // console.log(apiUrl);
-  const [areaPropiedad, setAreaPropiedad] = useState(0);
-  const [areaContruidaPropiedad, setAreaContruidaPropiedad] = useState(0);
   const [address, setAddress] = useState({
     country: "Perú",
     province: "Lima",
@@ -84,19 +105,20 @@ const EditPropiedad = () => {
     postalCode: "",
     exactAddress: "",
   });
-  useEffect(() => {
-    if (propiedad) {
-      let newAd = {
-        country: "Perú",
-        province: propiedad?.region_name,
-        locality: propiedad?.provincia_name,
-        zone: propiedad?.distrito_name,
-        postalCode: propiedad?.postalcode,
-        exactAddress: propiedad?.exactAddress,
-      };
-      setAddress(newAd);
-    }
-  }, [propiedad]);
+  console.log(address);
+  // useEffect(() => {
+  //   if (propiedad) {
+  //     let newAd = {
+  //       country: "Perú",
+  //       province: propiedad?.region_name,
+  //       locality: propiedad?.provincia_name,
+  //       zone: propiedad?.distrito_name,
+  //       postalCode: propiedad?.postalcode,
+  //       exactAddress: propiedad?.exactAddress,
+  //     };
+  //     setAddress(newAd);
+  //   }
+  // }, [propiedad]);
 
   useEffect(() => {
     const fetchRegions = async () => {
@@ -175,48 +197,43 @@ const EditPropiedad = () => {
   };
 
   useEffect(() => {
-    if (propiedad) {
-      const fetchCoordinates = async () => {
-        try {
-          const {
-            country,
-            province,
-            locality,
-            zone,
-            postalCode,
-            exactAddress,
-          } = address;
-          const fullAddress = `${exactAddress}, ${zone}, ${locality}, ${province}, ${postalCode}, ${country}`;
-          const response = await axios.get(
-            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-              fullAddress
-            )}&format=json&limit=1`
-          );
-          console.log(response);
-          console.log(fullAddress);
-          if (response.data.length > 0) {
-            const { lat, lon } = response.data[0];
-            const newPos = [parseFloat(lat), parseFloat(lon)];
-            setPropiedad({
-              ...propiedad,
-              position_locate: JSON.stringify(newPos),
-            });
+    console.log("entro aqui");
+    const fetchCoordinates = async () => {
+      try {
+        const { country, province, locality, zone, postalCode, exactAddress } =
+          address;
+        const fullAddress = `${exactAddress}, ${zone}, ${locality}, ${province}, ${postalCode}, ${country}`;
+        const response = await axios.get(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+            fullAddress
+          )}&format=json&limit=1`
+        );
+        console.log(response);
+        console.log(fullAddress);
+        if (response.data.length > 0) {
+          const { lat, lon } = response.data[0];
+          const newPos = [parseFloat(lat), parseFloat(lon)];
+          console.log(newPos);
 
-            if (mapRef.current) {
-              mapRef.current.flyTo(newPos, 17, { duration: 1 }); // Ajustar la vista del mapa a la nueva posición
-            }
-          } else {
-            console.log(
-              "No se encontraron coordenadas para la dirección proporcionada."
-            );
+          setPropiedad((prevState) => ({
+            ...prevState,
+            position_locate: JSON.stringify(newPos),
+          }));
+
+          if (mapRef.current) {
+            mapRef.current.flyTo(newPos, 17, { duration: 1 }); // Ajustar la vista del mapa a la nueva posición
           }
-        } catch (error) {
-          console.error("Error al obtener las coordenadas:", error);
+        } else {
+          console.log(
+            "No se encontraron coordenadas para la dirección proporcionada."
+          );
         }
-      };
-      fetchCoordinates();
-    }
-  }, [propiedad]);
+      } catch (error) {
+        console.error("Error al obtener las coordenadas:", error);
+      }
+    };
+    fetchCoordinates();
+  }, [address]);
 
   const handleLocate = () => {
     // Lógica para actualizar la posición basándose en la dirección proporcionada
@@ -256,11 +273,15 @@ const EditPropiedad = () => {
     if (response.data) {
       const { road, town, region, state, postcode } = response.data.address;
       console.log(road, town, region, state, postcode);
-      setPropiedad({ ...propiedad, exactAddress: road });
-      setPropiedad({
-        ...propiedad,
+
+      setPropiedad((prevState) => ({
+        ...prevState,
+        exactAddress: road,
+      }));
+      setPropiedad((prevState) => ({
+        ...prevState,
         postalCode: postcode === undefined ? "" : postcode,
-      });
+      }));
 
       if (mapRef.current) {
         mapRef.current.flyTo([lat, lng], 17, { duration: 1 }); // Ajustar la vista del mapa a la nueva posición
@@ -271,8 +292,13 @@ const EditPropiedad = () => {
       );
     }
   };
+  console.log(propiedad);
   const setPositionAndAdress = (latlng) => {
-    setPropiedad({ ...propiedad, position_locate: latlng });
+    console.log("entro aqui");
+    setPropiedad((prevState) => ({
+      ...prevState,
+      position_locate: JSON.stringify(latlng),
+    }));
     handleMapClick(latlng);
   };
   const [coverImage, setCoverImage] = useState(null);
@@ -566,139 +592,145 @@ const EditPropiedad = () => {
   // section amenitites
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [models, setModels] = useState([]);
-  const handleSendProperty = async () => {
-    setLoadingCreate(false);
-    let newPropiedad = {
-      nombre: nombrePropiedad,
-      tipo: tipoPropiedad,
-      purpose: proposito,
-      descripcion: descripcionPropiedad,
-      video_descripcion: videoDescripcionPropiedad,
-      link_extra: linkExtra,
-      region: selectedProvince,
-      provincia: selectedLocality,
-      distrito: selectedZone,
-      exactAddress: exactAddress,
-      postalcode: postalCode,
-      position_locate: position,
-      area_from: areaPropiedad,
-      area_const_from: areaContruidaPropiedad,
-      precio_from: precioPropiedad,
-      moneda: monedaPreciopropiedad,
-      etapa: etapaPropiedad,
-      fecha_entrega: fechaentrega,
-      fecha_captacion: fechaCaptacion,
-      fecha_created: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-      financiamiento: financiamiento,
-      created_by: session.id,
-      status: statusPublicacion,
-      name_reference: referencia,
-    };
-    console.log(newPropiedad);
-    console.log(selectedAmenities);
-    console.log(coverImage);
-    console.log(galleryImages);
-    console.log(models);
-    const propiedadData = await createPropiedad(newPropiedad);
-    console.log(propiedadData);
-    if (propiedadData.message === "add") {
-      let idPropiedad = propiedadData.id;
-      let multimediaPropiedad = [];
-      if (coverImage !== null) {
-        const coverData = await sendCoverPropiedad(nombrePropiedad);
-        let newMultimedia = {
-          categoria: "Fotos",
-          url_file: coverData.coverImage,
-          propiedad_id: idPropiedad,
-          etiqueta: "Portada",
-        };
-        multimediaPropiedad.push(newMultimedia);
-      }
-      if (galleryImages.length > 0) {
-        const galleryData = await sendGalleryPropiedad(nombrePropiedad);
-        galleryData.galleryImages.forEach((file) => {
-          let newMultimedia = {
-            categoria: "Fotos",
-            url_file: file,
-            propiedad_id: idPropiedad,
-            etiqueta: "Galeria",
-          };
-          multimediaPropiedad.push(newMultimedia);
-        });
-      }
-      if (multimediaPropiedad.length > 0) {
-        const multimediaData = await createMultimediaPropiedad(
-          multimediaPropiedad
-        );
-        console.log(multimediaData);
-      }
-      if (selectedAmenities.length > 0) {
-        let newAmenidades = [];
-        selectedAmenities.forEach((amenity) => {
-          let newAmenidad = {
-            propiedad_id: idPropiedad,
-            amenidad: amenity,
-          };
-          newAmenidades.push(newAmenidad);
-        });
-        const amenidadesData = await createAmenidadesPropiedad(newAmenidades);
-        console.log(amenidadesData);
-      }
-      if (models.length > 0) {
-        let newModelos = [];
-        let imagesModelos = [];
-        models.forEach((model) => {
-          let newImage = {
-            file: model.imagen,
-          };
-          imagesModelos.push(newImage);
-        });
-        const imagesModelosData = await sendImagesModelos(
-          nombrePropiedad,
-          imagesModelos
-        );
+  // const handleSendProperty = async () => {
+  //   setLoadingCreate(false);
+  //   let newPropiedad = {
+  //     nombre: nombrePropiedad,
+  //     tipo: tipoPropiedad,
+  //     purpose: proposito,
+  //     descripcion: descripcionPropiedad,
+  //     video_descripcion: videoDescripcionPropiedad,
+  //     link_extra: linkExtra,
+  //     region: selectedProvince,
+  //     provincia: selectedLocality,
+  //     distrito: selectedZone,
+  //     exactAddress: exactAddress,
+  //     postalcode: postalCode,
+  //     position_locate: position,
+  //     area_from: areaPropiedad,
+  //     area_const_from: areaContruidaPropiedad,
+  //     precio_from: precioPropiedad,
+  //     moneda: monedaPreciopropiedad,
+  //     etapa: etapaPropiedad,
+  //     fecha_entrega: fechaentrega,
+  //     fecha_captacion: fechaCaptacion,
+  //     fecha_created: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+  //     financiamiento: financiamiento,
+  //     created_by: session.id,
+  //     status: statusPublicacion,
+  //     name_reference: referencia,
+  //   };
+  //   console.log(newPropiedad);
+  //   console.log(selectedAmenities);
+  //   console.log(coverImage);
+  //   console.log(galleryImages);
+  //   console.log(models);
+  //   const propiedadData = await createPropiedad(newPropiedad);
+  //   console.log(propiedadData);
+  //   if (propiedadData.message === "add") {
+  //     let idPropiedad = propiedadData.id;
+  //     let multimediaPropiedad = [];
+  //     if (coverImage !== null) {
+  //       const coverData = await sendCoverPropiedad(nombrePropiedad);
+  //       let newMultimedia = {
+  //         categoria: "Fotos",
+  //         url_file: coverData.coverImage,
+  //         propiedad_id: idPropiedad,
+  //         etiqueta: "Portada",
+  //       };
+  //       multimediaPropiedad.push(newMultimedia);
+  //     }
+  //     if (galleryImages.length > 0) {
+  //       const galleryData = await sendGalleryPropiedad(nombrePropiedad);
+  //       galleryData.galleryImages.forEach((file) => {
+  //         let newMultimedia = {
+  //           categoria: "Fotos",
+  //           url_file: file,
+  //           propiedad_id: idPropiedad,
+  //           etiqueta: "Galeria",
+  //         };
+  //         multimediaPropiedad.push(newMultimedia);
+  //       });
+  //     }
+  //     if (multimediaPropiedad.length > 0) {
+  //       const multimediaData = await createMultimediaPropiedad(
+  //         multimediaPropiedad
+  //       );
+  //       console.log(multimediaData);
+  //     }
+  //     if (selectedAmenities.length > 0) {
+  //       let newAmenidades = [];
+  //       selectedAmenities.forEach((amenity) => {
+  //         let newAmenidad = {
+  //           propiedad_id: idPropiedad,
+  //           amenidad: amenity,
+  //         };
+  //         newAmenidades.push(newAmenidad);
+  //       });
+  //       const amenidadesData = await createAmenidadesPropiedad(newAmenidades);
+  //       console.log(amenidadesData);
+  //     }
+  //     if (models.length > 0) {
+  //       let newModelos = [];
+  //       let imagesModelos = [];
+  //       models.forEach((model) => {
+  //         let newImage = {
+  //           file: model.imagen,
+  //         };
+  //         imagesModelos.push(newImage);
+  //       });
+  //       const imagesModelosData = await sendImagesModelos(
+  //         nombrePropiedad,
+  //         imagesModelos
+  //       );
 
-        models.forEach((modelo, index) => {
-          let newModel = {
-            propiedad_id: idPropiedad,
-            categoria: modelo.categoria,
-            nombre: modelo.nombre,
-            imagenUrl:
-              imagesModelosData.modelosImages[index] === undefined
-                ? ""
-                : imagesModelosData.modelosImages[index],
-            precio: modelo.precio,
-            moneda: modelo.moneda,
-            area: modelo.area,
-            habs: modelo.habs,
-            garage: modelo.garage,
-            banios: modelo.banios,
-            etapa: modelo.etapa,
-          };
-          newModelos.push(newModel);
-        });
-        const modelsData = await createModelosPropiedad(newModelos);
-        console.log(modelsData);
-        let newUnidades = [];
-        modelsData.ids.forEach((idModel, index) => {
-          models[index].unidades.forEach((unidad) => {
-            let newUnidad = {
-              modelo_id: idModel,
-              nombre: unidad.nombre,
-              status: unidad.status,
-            };
-            newUnidades.push(newUnidad);
-          });
-        });
-        const unidadesData = await createUnidadesModelos(newUnidades);
-        console.log(unidadesData);
-      }
-      setLoadingCreate(false);
-      message.success("Se agrego la propiedad");
-      navigate("/propiedades");
-    } else {
-      message.error("Ocurrio un error");
-    }
+  //       models.forEach((modelo, index) => {
+  //         let newModel = {
+  //           propiedad_id: idPropiedad,
+  //           categoria: modelo.categoria,
+  //           nombre: modelo.nombre,
+  //           imagenUrl:
+  //             imagesModelosData.modelosImages[index] === undefined
+  //               ? ""
+  //               : imagesModelosData.modelosImages[index],
+  //           precio: modelo.precio,
+  //           moneda: modelo.moneda,
+  //           area: modelo.area,
+  //           habs: modelo.habs,
+  //           garage: modelo.garage,
+  //           banios: modelo.banios,
+  //           etapa: modelo.etapa,
+  //         };
+  //         newModelos.push(newModel);
+  //       });
+  //       const modelsData = await createModelosPropiedad(newModelos);
+  //       console.log(modelsData);
+  //       let newUnidades = [];
+  //       modelsData.ids.forEach((idModel, index) => {
+  //         models[index].unidades.forEach((unidad) => {
+  //           let newUnidad = {
+  //             modelo_id: idModel,
+  //             nombre: unidad.nombre,
+  //             status: unidad.status,
+  //           };
+  //           newUnidades.push(newUnidad);
+  //         });
+  //       });
+  //       const unidadesData = await createUnidadesModelos(newUnidades);
+  //       console.log(unidadesData);
+  //     }
+  //     setLoadingCreate(false);
+  //     message.success("Se agrego la propiedad");
+  //     navigate("/propiedades");
+  //   } else {
+  //     message.error("Ocurrio un error");
+  //   }
+  // };
+  const handleCancel = () => {
+    setPropiedad(initialData);
+  };
+  const handleSave = () => {
+    setPropiedad(initialData);
   };
   return (
     <>
@@ -846,7 +878,7 @@ const EditPropiedad = () => {
                   <iframe
                     className="w-full max-w-[500px] h-[125px] md:h-[200px]"
                     id="urlvideoY"
-                    src={obtenerCodigoVideo(propiedad?.video_descripcion)}
+                    src={obtenerCodigoVideo(propiedad.video_descripcion)}
                     title="YouTube video player"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -1071,7 +1103,11 @@ const EditPropiedad = () => {
                   <input
                     type="text"
                     className="bg-[#f8f8f8] text-sm border-0 border-none h-full px-[12px] w-full focus:outline-none"
-                    value={propiedad.exactAddress}
+                    value={
+                      propiedad.exactAddress === null
+                        ? ""
+                        : propiedad.exactAddress
+                    }
                     onChange={(e) =>
                       handlePropiedad("exactAddress", e.target.value)
                     }
@@ -1081,7 +1117,7 @@ const EditPropiedad = () => {
                 </div>
               </div>
             </div>
-            <div className="w-full">
+            <div className="w-full relative z-10">
               <MapComponent
                 position={JSON.parse(propiedad?.position_locate)}
                 address={address}
@@ -1302,22 +1338,60 @@ const EditPropiedad = () => {
               (Tamaño máximo <b>50 Mb</b> por archivo)
             </div>
           </div>
-          <Amenities
-            selectedAmenities={selectedAmenities}
-            setSelectedAmenities={setSelectedAmenities}
+          <AmenitiesEdit
+            selectedAmenities={amenidades}
+            setSelectedAmenities={setAmenidades}
           />
           <Modelos models={models} setModels={setModels} />
-          <div className="w-full flex justify-between">
+          {/* <FloatButton.Group
+            trigger="click"
+            type="primary"
+            style={{
+              right: 94, 
+            }} shape="square"
+            icon={<FaSave className="w-full"/>}
+          >
+            <FloatButton className="w-full" />
+            <FloatButton className="w-full"
+              icon={
+                <>
+                  <FaSave />
+                </>
+              }
+            />
+          </FloatButton.Group> */}
+          <div className="w-full flex justify-between px-3 bottom-[-31px] py-6 sticky z-50 bg-white shadow-md">
             <span className="text-sm text-bold-font font-mdium">
               * Campos requeridos
             </span>
-            <button
-              disabled={loadingCreate}
-              className="btn-create h-[46px] flex gap-2 items-center"
-              onClick={() => handleSendProperty()}
-            >
-              <span className="mobile-hide">Crear propiedad</span>
-            </button>
+            <div className="flex items-center gap-4 justify-end">
+              <button
+                disabled={
+                  JSON.stringify(propiedad) === JSON.stringify(initialData)
+                }
+                onClick={handleCancel}
+                className={`rounded-full text-[12px] px-5 py-2   ${
+                  JSON.stringify(propiedad) === JSON.stringify(initialData)
+                    ? "text-gray-500 bg-gray-300"
+                    : "text-bold-font bg-white border-gray-300 border"
+                }`}
+              >
+                Cancelar
+              </button>
+              <button
+                disabled={
+                  JSON.stringify(propiedad) === JSON.stringify(initialData)
+                }
+                onClick={handleSave}
+                className={`rounded-full text-[12px] px-5 py-2 ${
+                  JSON.stringify(propiedad) === JSON.stringify(initialData)
+                    ? "text-gray-500 bg-gray-300"
+                    : "text-white bg-dark-purple"
+                } `}
+              >
+                Actualizar
+              </button>
+            </div>
           </div>
         </div>
       ) : null}
