@@ -138,13 +138,11 @@ const AmenitiesEdit = ({
   setSelectedAmenities,
   initialAmenities,
   setAddedAmenityIds,
-  setRemovedAmenityIds,
+  setRemovedAmenityIds, propiedad_id
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [originalAmenitiesMap, setOriginalAmenitiesMap] = useState({});
-  console.log(selectedAmenities);
-  console.log(initialAmenities);
-  console.log(originalAmenitiesMap);
+  
   useEffect(() => {
     const map = {};
     initialAmenities.forEach((amenity) => {
@@ -186,19 +184,6 @@ const AmenitiesEdit = ({
     const existingAmenity = selectedAmenities.find(
       (item) => item.amenidad === amenity
     );
-    if (existInitial && existingAmenity) {
-    }
-    // existe en la amenidade inicial
-    // existe en la amenidad en seleccion
-    //    eliminar la amenidad de seleccion
-    //    agregar en removeids
-    // si no existe en la amenidad en seleccion
-    //    agrega a la amenidad de seleccion
-    //    quitar amenidad en removeids
-
-    // no existe en la amenidade inicial
-
-    //    agrega a la amenidad de seleccion
 
     if (existInitial) {
       if (existingAmenity) {
@@ -211,23 +196,23 @@ const AmenitiesEdit = ({
         );
       } else {
         const id = originalAmenitiesMap[amenity] || "no";
-        const amenity_encontrada = initialAmenities.find(
-          (o) => o.amenidad === amenity
-        );
+
         const newAmenity = {
           amenidad: amenity,
           id,
-          propiedad_id: amenity_encontrada
-            ? amenity_encontrada.propiedad_id
-            : "no",
+          propiedad_id: propiedad_id
         };
 
+        setAddedAmenityIds((prev) =>
+          prev.filter((item) => item.amenidad !== amenity)
+        );
+        setRemovedAmenityIds((prev) =>
+          prev.filter((item) => item.amenidad !== amenity)
+        );
         setSelectedAmenities([...selectedAmenities, newAmenity]);
-        setAddedAmenityIds((prev) => [...prev, newAmenity]);
       }
     } else {
       if (existingAmenity) {
-        setRemovedAmenityIds((prev) => [...prev, existingAmenity]);
         setAddedAmenityIds((prev) =>
           prev.filter((item) => item.amenidad !== amenity)
         );
@@ -238,7 +223,7 @@ const AmenitiesEdit = ({
         const newAmenity = {
           amenidad: amenity,
           id: "no",
-          propiedad_id: "no",
+          propiedad_id: propiedad_id,
         };
         setAddedAmenityIds((prev) => [...prev, newAmenity]);
 

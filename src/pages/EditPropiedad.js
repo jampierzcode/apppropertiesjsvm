@@ -36,7 +36,6 @@ const EditPropiedad = () => {
       try {
         const response = await axios.get(`${apiUrl}/propiedades/${query}`, {});
         console.log(response.data);
-        setLoadingCreate(false);
         let data = response.data;
         setPropiedad(response.data);
         setInitialData(response.data);
@@ -49,6 +48,9 @@ const EditPropiedad = () => {
           exactAddress: data?.exactAddress === null ? "" : data?.exactAddress,
         };
         setAddress(newAd);
+        setTimeout(() => {
+          setLoadingCreate(false);
+        }, 3000);
       } catch (error) {
         console.error("Error al obtener los datos de la propiedad:", error);
       }
@@ -518,6 +520,7 @@ const EditPropiedad = () => {
   const createAmenidadesPropiedad = async (newAmenities) => {
     return new Promise(async (resolve, reject) => {
       const token = session.token;
+      console.log(token);
 
       try {
         const response = await axios.post(
@@ -588,7 +591,6 @@ const EditPropiedad = () => {
     });
   };
   // section amenitites
-  const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [models, setModels] = useState([]);
   // const handleSendProperty = async () => {
   //   setLoadingCreate(false);
@@ -753,13 +755,131 @@ const EditPropiedad = () => {
     setPropiedad(initialData);
     setAmenidades(initialAmenidades);
   };
-  const handleSave = () => {
-    console.log(save);
+  const sendUpdatePropiedad = async (newPropiedad) => {
+    return new Promise(async (resolve, reject) => {
+      const token = session.token;
+
+      try {
+        const response = await axios.put(
+          `${apiUrl}/propiedades/${query}`,
+          newPropiedad,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response);
+        const data = response.data;
+        resolve(data);
+      } catch (error) {
+        reject(error);
+        console.error("Upload error:", error);
+      }
+    });
+  };
+  const sendDeleteAmenidades = async (newAmenidades) => {
+    return new Promise(async (resolve, reject) => {
+      const token = session.token;
+      console.log(token);
+      try {
+        const response = await axios.post(
+          `${apiUrl}/deleteamenidadespropiedades`,
+          newAmenidades,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response);
+        const data = response.data;
+        resolve(data);
+      } catch (error) {
+        reject(error);
+        console.error("Upload error:", error);
+      }
+    });
+  };
+  const handleSave = async () => {
+    console.log("save");
+    setLoadingCreate(true);
+    const arePropiedadesEqual = compareStates(propiedad, initialData);
+    if (!arePropiedadesEqual) {
+      const sendPropiedad = await sendUpdatePropiedad(propiedad);
+      if (sendPropiedad.message === "update") {
+        setInitialData(propiedad);
+      } else {
+        message.error("Ocurrio un error, intentelo mas tarde");
+      }
+    }
+    let newAmenidades = [];
+    if (addedAmenityIds.length > 0) {
+      addedAmenityIds.forEach((amenity) => {
+        let newAmenidad = {
+          propiedad_id: amenity.propiedad_id,
+          amenidad: amenity.amenidad,
+        };
+        newAmenidades.push(newAmenidad);
+      });
+      const sendAmenidades = await createAmenidadesPropiedad(newAmenidades);
+      if (sendAmenidades.message === "add") {
+        // Actualiza el estado create con los nuevos ids
+        const updatedCreate = addedAmenityIds.map((item, index) => ({
+          ...item,
+          id: sendAmenidades.ids[index], // Asumiendo que los ids están en el mismo orden
+        }));
+        newAmenidades = updatedCreate;
+      } else {
+        message.error("Ocurrio un error, intentelo mas tarde");
+        setTimeout(() => {
+          setLoadingCreate(false);
+        }, 3000);
+        return;
+      }
+    }
+    if (removedAmenityIds.length > 0) {
+      const deleteAmenidades = await sendDeleteAmenidades(removedAmenityIds);
+      if (deleteAmenidades.message === "delete") {
+        
+      } else {
+        message.error("Ocurrio un error, intentelo mas tarde");
+        setTimeout(() => {
+          setLoadingCreate(false);
+        }, 3000);
+        return;
+      }
+    }
+    console.log(newAmenidades);
+    let updatedAmenidades = [...initialAmenidades];
+
+    // Agregar las nuevas amenidades solo si el array no está vacío
+    if (newAmenidades.length > 0) {
+      updatedAmenidades = [...updatedAmenidades, ...newAmenidades];
+    }
+
+    // Filtrar las amenidades eliminadas solo si el array no está vacío
+    if (removedAmenityIds.length > 0) {
+      updatedAmenidades = updatedAmenidades.filter(
+        (amenidad) =>
+          !removedAmenityIds.some((eliminada) => eliminada.id === amenidad.id)
+      );
+    }
+    setAddedAmenityIds([]);
+    setRemovedAmenityIds([]);
+    setInitialAmenidades(updatedAmenidades);
+    setAmenidades(updatedAmenidades);
+    message.success("Se actualizo correctamente la propiedad");
+    setTimeout(() => {
+      setLoadingCreate(false);
+    }, 3000);
   };
   return (
     <>
       {loadingCreate ? (
-        <div className="fixed top-0 left-0 w-full h-[100vh] bg-gray-600 text-sm flex items-center justify-center">
+        <div className="fixed top-0 left-0 right-0 bottom-0 w-full h-[100vh] bg-dark-purple text-white text-xl flex items-center justify-center z-[2000] ">
           Cargando...
         </div>
       ) : null}
@@ -788,8 +908,8 @@ const EditPropiedad = () => {
               <div className="flex items-center gap-3 flex-wrap ml-[8px]">
                 <label className="flex items-center text-sm">
                   <input
-                    onChange={() => setStatusPublicacion("Publicado")}
-                    checked={statusPublicacion === "Publicado" ? true : false}
+                    onChange={() => handlePropiedad("status", "Publicado")}
+                    checked={propiedad?.status === "Publicado" ? true : false}
                     type="radio"
                     name="estado"
                     className="mr-[6px]"
@@ -799,8 +919,8 @@ const EditPropiedad = () => {
                 </label>
                 <label className="flex items-center text-sm">
                   <input
-                    onChange={() => setStatusPublicacion("Borrador")}
-                    checked={statusPublicacion === "Borrador" ? true : false}
+                    onChange={() => handlePropiedad("status", "Borrador")}
+                    checked={propiedad?.status === "Borrador" ? true : false}
                     type="radio"
                     name="estado"
                     className="mr-[6px]"
@@ -1363,6 +1483,7 @@ const EditPropiedad = () => {
             </div>
           </div>
           <AmenitiesEdit
+            propiedad_id={query}
             setAddedAmenityIds={setAddedAmenityIds}
             setRemovedAmenityIds={setRemovedAmenityIds}
             selectedAmenities={amenidades}
