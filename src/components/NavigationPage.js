@@ -78,7 +78,7 @@ const NavigationPage = () => {
         <div className="logo w-[25%]">
           <Link to={"/"}>
             <img
-              className="w-[85%] object-contain object-left"
+              className="w-[70%] object-contain object-left"
               src={businessData.length !== 0 ? businessData.logo : "no-logo"}
               alt=""
             />

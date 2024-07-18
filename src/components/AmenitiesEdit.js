@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaSearch, FaTimes } from "react-icons/fa";
 
 const amenitiesList = [
@@ -133,17 +133,117 @@ const amenitiesList = [
   "boulevard",
 ];
 
-const AmenitiesEdit = ({ selectedAmenities, setSelectedAmenities }) => {
-    console.log(selectedAmenities)
+const AmenitiesEdit = ({
+  selectedAmenities,
+  setSelectedAmenities,
+  initialAmenities,
+  setAddedAmenityIds,
+  setRemovedAmenityIds,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [originalAmenitiesMap, setOriginalAmenitiesMap] = useState({});
+  console.log(selectedAmenities);
+  console.log(initialAmenities);
+  console.log(originalAmenitiesMap);
+  useEffect(() => {
+    const map = {};
+    initialAmenities.forEach((amenity) => {
+      map[amenity.amenidad] = amenity.id;
+    });
+    setOriginalAmenitiesMap(map);
+  }, [initialAmenities]);
+
+  // const handleChange = (amenity) => {
+  //   console.log(originalAmenitiesMap[amenity]);
+  //   const existingAmenity = selectedAmenities.find(
+  //     (item) => item.amenidad === amenity
+  //   );
+  //   if (existingAmenity) {
+  //     setSelectedAmenities(
+  //       selectedAmenities.filter((item) => item.amenidad !== amenity)
+  //     );
+  //   } else {
+  //     const id = originalAmenitiesMap[amenity] || "no";
+  //     const amenity_encontrada = initialAmenities.find(
+  //       (o) => o.amenidad === amenity
+  //     );
+  //     setSelectedAmenities([
+  //       ...selectedAmenities,
+  //       {
+  //         amenidad: amenity,
+  //         id,
+  //         propiedad_id: amenity_encontrada
+  //           ? amenity_encontrada.propiedad_id
+  //           : "no",
+  //       },
+  //     ]);
+  //   }
+  // };
   const handleChange = (amenity) => {
-    const bol = selectedAmenities.filter(s=>s.amenidad ===amenity)
-    if(bol.length!==0){
-      setSelectedAmenities(
-        selectedAmenities.filter((item) => item.amenidad !== amenity)
-      );
+    const existInitial = initialAmenities.find(
+      (item) => item.amenidad === amenity
+    );
+    const existingAmenity = selectedAmenities.find(
+      (item) => item.amenidad === amenity
+    );
+    if (existInitial && existingAmenity) {
+    }
+    // existe en la amenidade inicial
+    // existe en la amenidad en seleccion
+    //    eliminar la amenidad de seleccion
+    //    agregar en removeids
+    // si no existe en la amenidad en seleccion
+    //    agrega a la amenidad de seleccion
+    //    quitar amenidad en removeids
+
+    // no existe en la amenidade inicial
+
+    //    agrega a la amenidad de seleccion
+
+    if (existInitial) {
+      if (existingAmenity) {
+        setSelectedAmenities(
+          selectedAmenities.filter((item) => item.amenidad !== amenity)
+        );
+        setRemovedAmenityIds((prev) => [...prev, existingAmenity]);
+        setAddedAmenityIds((prev) =>
+          prev.filter((item) => item.amenidad !== amenity)
+        );
+      } else {
+        const id = originalAmenitiesMap[amenity] || "no";
+        const amenity_encontrada = initialAmenities.find(
+          (o) => o.amenidad === amenity
+        );
+        const newAmenity = {
+          amenidad: amenity,
+          id,
+          propiedad_id: amenity_encontrada
+            ? amenity_encontrada.propiedad_id
+            : "no",
+        };
+
+        setSelectedAmenities([...selectedAmenities, newAmenity]);
+        setAddedAmenityIds((prev) => [...prev, newAmenity]);
+      }
     } else {
-      setSelectedAmenities([...selectedAmenities, {amenidad: amenity, id: "no", propiedad_id: "no"}]);
+      if (existingAmenity) {
+        setRemovedAmenityIds((prev) => [...prev, existingAmenity]);
+        setAddedAmenityIds((prev) =>
+          prev.filter((item) => item.amenidad !== amenity)
+        );
+        setSelectedAmenities(
+          selectedAmenities.filter((item) => item.amenidad !== amenity)
+        );
+      } else {
+        const newAmenity = {
+          amenidad: amenity,
+          id: "no",
+          propiedad_id: "no",
+        };
+        setAddedAmenityIds((prev) => [...prev, newAmenity]);
+
+        setSelectedAmenities([...selectedAmenities, newAmenity]);
+      }
     }
   };
 
@@ -163,7 +263,6 @@ const AmenitiesEdit = ({ selectedAmenities, setSelectedAmenities }) => {
           <span className="text-xs mb-3 font-medium text-bold-font">
             Buscar{" "}
           </span>
-
           <div className="flex justify-between items-center w-full px-3 py-2 rounded border-2 border-gray-200">
             <input
               className="bg-transparent"
@@ -184,7 +283,7 @@ const AmenitiesEdit = ({ selectedAmenities, setSelectedAmenities }) => {
           </div>
         </div>
       </div>
-      <div className="amenities-list grid  grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="amenities-list grid grid-cols-1 md:grid-cols-3 gap-3">
         {filteredAmenities.map((amenity, index) => (
           <div key={index} className="amenity-item">
             <input
@@ -193,7 +292,9 @@ const AmenitiesEdit = ({ selectedAmenities, setSelectedAmenities }) => {
               id={`amenity-${index}`}
               name={amenity}
               value={amenity}
-              checked={selectedAmenities.find(item=> item.amenidad===amenity ? item.amenidad : false)}
+              checked={
+                !!selectedAmenities.find((item) => item.amenidad === amenity)
+              }
               onChange={() => handleChange(amenity)}
             />
             <label

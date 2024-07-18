@@ -37,7 +37,7 @@ const MapComponent = ({ position, address, mapRef, setPosition }) => {
   return (
     <MapContainer
       center={position}
-      zoom={13}
+      zoom={17}
       style={{ height: "400px", width: "100%" }}
       ref={mapRef}
     >

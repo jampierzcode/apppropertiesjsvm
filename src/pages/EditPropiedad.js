@@ -28,7 +28,7 @@ const EditPropiedad = () => {
   const [initialData, setInitialData] = useState(null);
   // ESTADOS DE DATOS BASICOS propiedad amenidades
   const [amenidades, setAmenidades] = useState([]);
-  const [initialAmenidades, setInitialAmenidades] = useState([])
+  const [initialAmenidades, setInitialAmenidades] = useState([]);
 
   useEffect(() => {
     setLoadingCreate(true);
@@ -56,14 +56,16 @@ const EditPropiedad = () => {
     fetchPropiedad();
   }, [apiUrl, query]);
   useEffect(() => {
-    if(propiedad){
+    if (propiedad) {
       const fetchAmenidadesProperty = async () => {
         try {
-          const response = await axios.get(`${apiUrl}/amenidadesbypropiedad/${query}`, {});
+          const response = await axios.get(
+            `${apiUrl}/amenidadesbypropiedad/${query}`,
+            {}
+          );
           console.log(response.data);
           setAmenidades(response.data);
           setInitialAmenidades(response.data);
-        
         } catch (error) {
           console.error("Error al obtener las amenidades del proyecto:", error);
         }
@@ -71,7 +73,6 @@ const EditPropiedad = () => {
       fetchAmenidadesProperty();
     }
   }, [apiUrl, query, propiedad]);
-
 
   function obtenerCodigoVideo(url) {
     console.log(url);
@@ -196,44 +197,40 @@ const EditPropiedad = () => {
     });
   };
 
-  useEffect(() => {
-    console.log("entro aqui");
-    const fetchCoordinates = async () => {
-      try {
-        const { country, province, locality, zone, postalCode, exactAddress } =
-          address;
-        const fullAddress = `${exactAddress}, ${zone}, ${locality}, ${province}, ${postalCode}, ${country}`;
-        const response = await axios.get(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-            fullAddress
-          )}&format=json&limit=1`
-        );
-        console.log(response);
-        console.log(fullAddress);
-        if (response.data.length > 0) {
-          const { lat, lon } = response.data[0];
-          const newPos = [parseFloat(lat), parseFloat(lon)];
-          console.log(newPos);
+  const fetchCoordinates = async () => {
+    try {
+      const { country, province, locality, zone, postalCode, exactAddress } =
+        address;
+      const fullAddress = `${exactAddress}, ${zone}, ${locality}, ${province}, ${postalCode}, ${country}`;
+      const response = await axios.get(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+          fullAddress
+        )}&format=json&limit=1`
+      );
+      console.log(response);
+      console.log(fullAddress);
+      if (response.data.length > 0) {
+        const { lat, lon } = response.data[0];
+        const newPos = [parseFloat(lat), parseFloat(lon)];
+        console.log(newPos);
 
-          setPropiedad((prevState) => ({
-            ...prevState,
-            position_locate: JSON.stringify(newPos),
-          }));
+        setPropiedad((prevState) => ({
+          ...prevState,
+          position_locate: JSON.stringify(newPos),
+        }));
 
-          if (mapRef.current) {
-            mapRef.current.flyTo(newPos, 17, { duration: 1 }); // Ajustar la vista del mapa a la nueva posición
-          }
-        } else {
-          console.log(
-            "No se encontraron coordenadas para la dirección proporcionada."
-          );
+        if (mapRef.current) {
+          mapRef.current.flyTo(newPos, 17, { duration: 1 }); // Ajustar la vista del mapa a la nueva posición
         }
-      } catch (error) {
-        console.error("Error al obtener las coordenadas:", error);
+      } else {
+        console.log(
+          "No se encontraron coordenadas para la dirección proporcionada."
+        );
       }
-    };
-    fetchCoordinates();
-  }, [address]);
+    } catch (error) {
+      console.error("Error al obtener las coordenadas:", error);
+    }
+  };
 
   const handleLocate = () => {
     // Lógica para actualizar la posición basándose en la dirección proporcionada
@@ -263,6 +260,7 @@ const EditPropiedad = () => {
       exactAddress: propiedad?.exactAddress,
     };
     setAddress(newAdress); // Coordenadas de ejemplo
+    fetchCoordinates();
   };
   const handleMapClick = async (latlng) => {
     const [lat, lng] = latlng;
@@ -726,11 +724,37 @@ const EditPropiedad = () => {
   //     message.error("Ocurrio un error");
   //   }
   // };
+  const [addedAmenityIds, setAddedAmenityIds] = useState([]);
+  const [removedAmenityIds, setRemovedAmenityIds] = useState([]);
+  const compareStates = (state1, state2) => {
+    return JSON.stringify(state1) === JSON.stringify(state2);
+  };
+  const compareStatesAmenidades = (state1, state2) => {
+    console.log(addedAmenityIds);
+    console.log(removedAmenityIds);
+    const ids1 = state1.map((item) => item.id).sort();
+    const ids2 = state2.map((item) => item.id).sort();
+    return JSON.stringify(ids1) === JSON.stringify(ids2);
+  };
+  const verificarCambios = () => {
+    const arePropiedadesEqual = compareStates(propiedad, initialData);
+    const areAmenidadesEqual = compareStatesAmenidades(
+      amenidades,
+      initialAmenidades
+    );
+
+    if (!arePropiedadesEqual || !areAmenidadesEqual) {
+      return false;
+    } else {
+      return true;
+    }
+  };
   const handleCancel = () => {
     setPropiedad(initialData);
+    setAmenidades(initialAmenidades);
   };
   const handleSave = () => {
-    setPropiedad(initialData);
+    console.log(save);
   };
   return (
     <>
@@ -1339,8 +1363,11 @@ const EditPropiedad = () => {
             </div>
           </div>
           <AmenitiesEdit
+            setAddedAmenityIds={setAddedAmenityIds}
+            setRemovedAmenityIds={setRemovedAmenityIds}
             selectedAmenities={amenidades}
             setSelectedAmenities={setAmenidades}
+            initialAmenities={initialAmenidades}
           />
           <Modelos models={models} setModels={setModels} />
           {/* <FloatButton.Group
@@ -1366,12 +1393,10 @@ const EditPropiedad = () => {
             </span>
             <div className="flex items-center gap-4 justify-end">
               <button
-                disabled={
-                  JSON.stringify(propiedad) === JSON.stringify(initialData)
-                }
+                disabled={verificarCambios()}
                 onClick={handleCancel}
                 className={`rounded-full text-[12px] px-5 py-2   ${
-                  JSON.stringify(propiedad) === JSON.stringify(initialData)
+                  verificarCambios()
                     ? "text-gray-500 bg-gray-300"
                     : "text-bold-font bg-white border-gray-300 border"
                 }`}
@@ -1379,12 +1404,10 @@ const EditPropiedad = () => {
                 Cancelar
               </button>
               <button
-                disabled={
-                  JSON.stringify(propiedad) === JSON.stringify(initialData)
-                }
+                disabled={verificarCambios()}
                 onClick={handleSave}
                 className={`rounded-full text-[12px] px-5 py-2 ${
-                  JSON.stringify(propiedad) === JSON.stringify(initialData)
+                  verificarCambios()
                     ? "text-gray-500 bg-gray-300"
                     : "text-white bg-dark-purple"
                 } `}
