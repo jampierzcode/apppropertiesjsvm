@@ -241,14 +241,10 @@ const ProyectosPage = () => {
   return (
     <>
       <div>
-        <div className="max-w-[1170px] mx-auto px-3 pt-[95px] py-5">
+        <div className="max-w-[1170px] mx-auto px-3 pt-[120px] py-5">
           <div className="flex flex-wrap justify-between gap-4">
-            <div className="flex flex-wrap">
-              <img
-                className="h-20"
-                src="https://e.nexoinmobiliario.pe/customers/abril-grupo-inmobiliario-ft/3209-tulipan/logo-tulipan-20231115133638.png"
-                alt=""
-              />
+            <div className="flex flex-wrap gap-3">
+              <img className="h-20" src={propiedad.logo} alt="" />
               <div className="">
                 <h1
                   style={{ color: settings.color_primary }}
@@ -420,21 +416,24 @@ const ProyectosPage = () => {
                     Descripcion de la propiedad
                   </h1>
                   <div className="grid grid-cols-1 gap-4 mt-4">
-                    <div>
-                      <iframe
-                        className="w-full h-[300px]"
-                        id="urlvideoY"
-                        src={obtenerCodigoVideo(
-                          propiedad.length === 0
-                            ? ""
-                            : propiedad?.video_descripcion
-                        )}
-                        title="YouTube video player"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                      />
-                    </div>
+                    {propiedad.video_descripcion !== "" ? (
+                      <div>
+                        <iframe
+                          className="w-full h-[300px]"
+                          id="urlvideoY"
+                          src={obtenerCodigoVideo(
+                            propiedad.length === 0
+                              ? ""
+                              : propiedad?.video_descripcion
+                          )}
+                          title="YouTube video player"
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                        />
+                      </div>
+                    ) : null}
+
                     <p
                       className="text-sm text-light-font py-4"
                       dangerouslySetInnerHTML={createMarkup(
@@ -577,110 +576,115 @@ const ProyectosPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="boxContain">
-                <div className="w-full">
-                  <h1
-                    style={{
-                      color: settings.color_primary,
-                      borderColor: settings.color_primary,
-                    }}
-                    className=" font-bold text-lg pb-1 border-b-2  w-full"
-                  >
-                    Modelos de {propiedad.tipo}
-                  </h1>
+              {modelos.length > 0 ? (
+                <div className="boxContain">
                   <div className="w-full">
-                    <div className="max-h-[620px] overflow-y-auto divide-y-2 flex flex-col gap-4">
-                      {modelos
-                        .filter(
-                          (model) => model.cantidad_unidades_disponibles > 0
-                        )
-                        .map((model, index) => (
-                          <div
-                            key={index}
-                            className="w-full py-4 grid grid-cols-6 gap-3"
-                          >
-                            <div className="w-full">
-                              <img
-                                className="w-full"
-                                src={model.imagenUrl}
-                                alt=""
-                              />
-                            </div>
-                            <div className="col-span-4 w-full">
-                              <div className="w-full top-info overflow-x-auto flex flex-wrap mb-4">
-                                <span className="px-4 text-sm md:w-[34%]">
-                                  Modelo
-                                </span>
-                                {model.habs === 0 ? null : (
-                                  <span className="px-4 text-sm md:w-[14%]">
-                                    Dorm.
-                                  </span>
-                                )}
-                                {model.banios === 0 ? null : (
-                                  <span className="px-4 text-sm md:w-[14%]">
-                                    Baños
-                                  </span>
-                                )}
-                                {Number(model.garage) === 0 ? null : (
-                                  <span className="px-4 text-sm md:w-[14%]">
-                                    Garage
-                                  </span>
-                                )}
-                                <span className="px-4 text-sm md:w-[19%]">
-                                  Area
-                                </span>
-                                <span className="px-4 text-sm md:w-[28%]">
-                                  Precio desde
-                                </span>
+                    <h1
+                      style={{
+                        color: settings.color_primary,
+                        borderColor: settings.color_primary,
+                      }}
+                      className=" font-bold text-lg pb-1 border-b-2  w-full"
+                    >
+                      Modelos de {propiedad.tipo}
+                    </h1>
+                    <div className="w-full">
+                      <div className="max-h-[620px] overflow-y-auto divide-y-2 flex flex-col gap-4">
+                        {modelos
+                          .filter(
+                            (model) => model.cantidad_unidades_disponibles > 0
+                          )
+                          .map((model, index) => (
+                            <div
+                              key={index}
+                              className="w-full py-4 grid grid-cols-6 gap-3"
+                            >
+                              <div className="w-full">
+                                <img
+                                  className="w-full"
+                                  src={model.imagenUrl}
+                                  alt=""
+                                />
                               </div>
-                              <div className="w-full bottom-info overflow-x-auto flex flex-wrap">
-                                <span className="px-4 text-sm font-bold md:w-[34%]">
-                                  {model.nombre}
-                                </span>
-                                {model.habs === 0 ? null : (
-                                  <span className="px-4 text-sm font-bold md:w-[14%]">
-                                    {model.habs}
+                              <div className="col-span-4 w-full">
+                                <div className="w-full top-info overflow-x-auto flex flex-wrap mb-4">
+                                  <span className="px-4 text-sm md:w-[34%]">
+                                    Modelo
                                   </span>
-                                )}
-                                {model.banios === 0 ? null : (
-                                  <span className="px-4 text-sm font-bold md:w-[14%]">
-                                    {model.banios}
+                                  {model.habs === 0 ? null : (
+                                    <span className="px-4 text-sm md:w-[14%]">
+                                      Dorm.
+                                    </span>
+                                  )}
+                                  {model.banios === 0 ? null : (
+                                    <span className="px-4 text-sm md:w-[14%]">
+                                      Baños
+                                    </span>
+                                  )}
+                                  {Number(model.garage) === 0 ? null : (
+                                    <span className="px-4 text-sm md:w-[14%]">
+                                      Garage
+                                    </span>
+                                  )}
+                                  <span className="px-4 text-sm md:w-[19%]">
+                                    Area
                                   </span>
-                                )}
-                                {Number(model.garage) === 0 ? null : (
-                                  <span className="px-4 text-sm font-bold md:w-[14%]">
-                                    {Number(model.garage) === 1 ? "SI" : "NO"}
+                                  <span className="px-4 text-sm md:w-[28%]">
+                                    Precio desde
                                   </span>
-                                )}
-                                <span className="px-4 text-sm font-bold md:w-[19%]">
-                                  {model.area} m2
-                                </span>
-                                <span className="px-4 text-sm font-bold md:w-[28%]">
-                                  {model.moneda === "DOLLAR"
-                                    ? model.precio
-                                    : null}{" "}
-                                  {model.moneda === "DOLLAR" ? "$" : "S/"}{" "}
-                                  {model.moneda === "PEN" ? model.precio : null}
-                                </span>
+                                </div>
+                                <div className="w-full bottom-info overflow-x-auto flex flex-wrap">
+                                  <span className="px-4 text-sm font-bold md:w-[34%]">
+                                    {model.nombre}
+                                  </span>
+                                  {model.habs === 0 ? null : (
+                                    <span className="px-4 text-sm font-bold md:w-[14%]">
+                                      {model.habs}
+                                    </span>
+                                  )}
+                                  {model.banios === 0 ? null : (
+                                    <span className="px-4 text-sm font-bold md:w-[14%]">
+                                      {model.banios}
+                                    </span>
+                                  )}
+                                  {Number(model.garage) === 0 ? null : (
+                                    <span className="px-4 text-sm font-bold md:w-[14%]">
+                                      {Number(model.garage) === 1 ? "SI" : "NO"}
+                                    </span>
+                                  )}
+                                  <span className="px-4 text-sm font-bold md:w-[19%]">
+                                    {model.area} m2
+                                  </span>
+                                  <span className="px-4 text-sm font-bold md:w-[28%]">
+                                    {model.moneda === "DOLLAR"
+                                      ? model.precio
+                                      : null}{" "}
+                                    {model.moneda === "DOLLAR" ? "$" : "S/"}{" "}
+                                    {model.moneda === "PEN"
+                                      ? model.precio
+                                      : null}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="w-full">
+                                <button
+                                  style={{
+                                    background: settings.color_primary,
+                                  }}
+                                  className="rounded font-bold text-white p-2 text-sm"
+                                >
+                                  Cotizar {model.cantidad_unidades_disponibles}{" "}
+                                  unidades
+                                </button>
                               </div>
                             </div>
-                            <div className="w-full">
-                              <button
-                                style={{
-                                  background: settings.color_primary,
-                                }}
-                                className="rounded font-bold text-white p-2 text-sm"
-                              >
-                                Cotizar {model.cantidad_unidades_disponibles}{" "}
-                                unidades
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                          ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              ) : null}
+
               <div className="boxContain">
                 <div className="w-full">
                   <h1

@@ -11,6 +11,7 @@ import Amenities from "../components/Amenities";
 import Modelos from "../components/Modelos";
 import dayjs from "dayjs";
 import { Navigate, useNavigate } from "react-router-dom";
+import LogoUpload from "../components/LogoUpload";
 
 const AddPropiedad = () => {
   const navigate = useNavigate();
@@ -537,9 +538,92 @@ const AddPropiedad = () => {
   // section amenitites
   const [selectedAmenities, setSelectedAmenities] = useState([]);
   const [models, setModels] = useState([]);
+  const [logoFilePropiedad, setLogoFilePropiedad] = useState("");
+  const [logoPropiedad, setLogoPropiedad] = useState("");
+  const sendImageLogo = async (modelosImages) => {
+    return new Promise(async (resolve, reject) => {
+      const token = session.token;
+      const formData = new FormData();
+
+      formData.append("propertyName", "logosproyectos");
+
+      modelosImages.forEach((img, index) => {
+        formData.append(`modelosImages[${index}]`, img.file);
+      });
+
+      try {
+        const response = await axios.post(`${apiUrl}/uploadimg`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = response.data;
+        resolve(data);
+      } catch (error) {
+        reject(error);
+        console.error("Upload error:", error);
+      }
+    });
+  };
   const handleSendProperty = async () => {
     setLoadingCreate(false);
+    if (nombrePropiedad === null || nombrePropiedad === "") {
+      message.warning("Debes establecer un nombre para subir esta propiedad");
+      return;
+    }
+    if (descripcionPropiedad === null || descripcionPropiedad === "") {
+      message.warning(
+        "Debes establecer una descripcion para subir esta propiedad"
+      );
+      return;
+    }
+    if (
+      precioPropiedad === null ||
+      precioPropiedad === "" ||
+      precioPropiedad === 0
+    ) {
+      message.warning("Debes establecer un precio para subir esta propiedad");
+      return;
+    }
+    if (areaPropiedad === null || areaPropiedad === "") {
+      message.warning(
+        "Debes establecer una descripcion para subir esta propiedad"
+      );
+      return;
+    }
+    if (selectedLocality === null || selectedLocality === "") {
+      message.warning(
+        "Debes establecer una ubicacion con region, provincia y distrito  para subir esta propiedad"
+      );
+      return;
+    }
+    if (selectedProvince === null || selectedProvince === "") {
+      message.warning(
+        "Debes establecer una ubicacion con region, provincia y distrito  para subir esta propiedad"
+      );
+      return;
+    }
+    if (selectedZone === null || selectedZone === "") {
+      message.warning(
+        "Debes establecer una ubicacion con region, provincia y distrito  para subir esta propiedad"
+      );
+      return;
+    }
+    if (coverImage === null || coverImage === "") {
+      message.warning(
+        "Debes subir una imagen de portada para subir esta propiedad"
+      );
+      return;
+    }
+    let urlLogo = "";
+    if (logoPropiedad !== "") {
+      const sendImagen = await sendImageLogo([{ file: logoFilePropiedad }]);
+      console.log(sendImagen);
+      urlLogo = sendImagen.modelosImages[0];
+    }
     let newPropiedad = {
+      logo: urlLogo,
       nombre: nombrePropiedad,
       tipo: tipoPropiedad,
       purpose: proposito,
@@ -565,11 +649,11 @@ const AddPropiedad = () => {
       status: statusPublicacion,
       name_reference: referencia,
     };
-    console.log(newPropiedad);
-    console.log(selectedAmenities);
-    console.log(coverImage);
-    console.log(galleryImages);
-    console.log(models);
+    // console.log(newPropiedad);
+    // console.log(selectedAmenities);
+    // console.log(coverImage);
+    // console.log(galleryImages);
+    // console.log(models);
     const propiedadData = await createPropiedad(newPropiedad);
     console.log(propiedadData);
     if (propiedadData.message === "add") {
@@ -664,6 +748,8 @@ const AddPropiedad = () => {
         const unidadesData = await createUnidadesModelos(newUnidades);
         console.log(unidadesData);
       }
+      setLogoFilePropiedad("");
+      setLogoPropiedad("");
       setLoadingCreate(false);
       message.success("Se agrego la propiedad");
       navigate("/propiedades");
@@ -727,13 +813,21 @@ const AddPropiedad = () => {
           </div>
         </div>
         <div className="boxPropie mb-6">
+          <h1 className="text-lg font-medium text-bold-font mb-[16px]">Logo</h1>
+          <div className="w-full flex items-center gap-3">
+            <LogoUpload
+              setLogoFile={setLogoFilePropiedad}
+              logo={logoPropiedad}
+              setLogo={(logo) => setLogoPropiedad(logo)}
+            />
+          </div>
           <h1 className="text-lg font-medium text-bold-font mb-[16px]">
             Datos básicos
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="w-full">
               <span className="text-sm font-medium text-bold-font">
-                Titulo de la propiedad
+                Titulo de la propiedad *
               </span>
               <div className="inputPropie">
                 <input
@@ -747,7 +841,7 @@ const AddPropiedad = () => {
             </div>
             <div className="w-full">
               <span className="text-sm font-medium text-bold-font">
-                Referencia *
+                Referencia
               </span>
               <div className="inputPropie">
                 <input
@@ -776,7 +870,7 @@ const AddPropiedad = () => {
           <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-4">
             <div className="w-full">
               <span className="text-sm font-medium text-bold-font">
-                Descripcion de la propiedad
+                Descripcion de la propiedad *
               </span>
               <div className="bg-[#f8f8f8] border border-[#c7c6c6] text-[#000] rounded-lg">
                 <textarea
@@ -872,7 +966,7 @@ const AddPropiedad = () => {
             </div>
             <div className="w-full ">
               <span className="text-sm font-medium text-bold-font leading-[24px]">
-                Precio
+                Precio *
               </span>
               <div className="inputPropie">
                 <input
@@ -920,7 +1014,7 @@ const AddPropiedad = () => {
             </div>
             <div className="w-full">
               <span className="text-sm font-medium text-bold-font leading-[24px]">
-                Region(departamento)
+                Region(departamento) *
               </span>
               <div className="inputPropie">
                 <Select
@@ -950,7 +1044,7 @@ const AddPropiedad = () => {
             </div>
             <div className="w-full">
               <span className="text-sm font-medium text-bold-font leading-[24px]">
-                Localidad(provincia)
+                Localidad(provincia) *
               </span>
               <div className="inputPropie">
                 <Select
@@ -978,7 +1072,7 @@ const AddPropiedad = () => {
             </div>
             <div className="w-full ">
               <span className="text-sm font-medium text-bold-font leading-[24px]">
-                Zona(Distrito)
+                Zona(Distrito) *
               </span>
               <div className="inputPropie">
                 <Select
@@ -1059,7 +1153,7 @@ const AddPropiedad = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="w-full">
               <span className="text-sm font-medium text-bold-font leading-[24px]">
-                Etapa de Desarrollo
+                Etapa de Desarrollo *
               </span>
               <div className="inputPropie">
                 <select

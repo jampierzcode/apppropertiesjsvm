@@ -6,7 +6,13 @@ import { Link, NavLink } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
 import axios from "axios";
 import dayjs from "dayjs";
-import { FaBuilding, FaEdit, FaEllipsisV, FaTrash } from "react-icons/fa";
+import {
+  FaBuilding,
+  FaEdit,
+  FaEllipsisV,
+  FaEye,
+  FaTrash,
+} from "react-icons/fa";
 import { BsViewList } from "react-icons/bs";
 import { FiImage } from "react-icons/fi";
 const { Option } = Select;
@@ -135,9 +141,12 @@ const Propiedades = () => {
         return matchSearch && matchFilters;
       });
       detectarTotalPages(filteredProperties);
+      const objetosOrdenados = filteredProperties.sort((a, b) =>
+        dayjs(b.fecha_created).isAfter(dayjs(a.fecha_created)) ? 1 : -1
+      );
       const startIndex = (currentPage - 1) * itemsPerPage;
       // setCurrentPage(1);
-      const paginatedProperties = filteredProperties.slice(
+      const paginatedProperties = objetosOrdenados.slice(
         startIndex,
         startIndex + itemsPerPage
       );
@@ -420,7 +429,7 @@ const Propiedades = () => {
               <td>Baños </td>
               <td>Garaje </td>
               <td>Precio </td>
-              <td>Foto</td>
+              <td>Logo</td>
               <td>Estado </td>
               <td className="ajustes-tabla-celda"></td>
             </tr>
@@ -449,32 +458,38 @@ const Propiedades = () => {
                     <td>
                       <div className="flex flex-col align-center">
                         {propiedad.nombre}
-                        <span className="small-size green">
+                        <span className="small-size green font-bold">
                           {propiedad.purpose}
                         </span>
                       </div>
                     </td>
                     <td>{propiedad.tipo}</td>
                     <td className="whitespace-no-wrap">
-                      {propiedad.region_name}
-                      {">"}
-                      {propiedad.provincia_name}
-                      {">"}
-                      {propiedad.distrito_name}
+                      {propiedad.exactAddress === null
+                        ? ""
+                        : propiedad.exactAddress}
+                      <br />
+                      <p className="font-bold">
+                        {propiedad.region_name}
+                        {", "}
+                        {propiedad.provincia_name}
+                        {", "}
+                        {propiedad.distrito_name}
+                      </p>
                     </td>
                     <td>
                       <div className="whitespace-no-wrap">
                         {propiedad.exactAddress}
                       </div>
                     </td>
-                    <td>{propiedad.habs}</td>
+                    <td>{propiedad.habs === null ? "0" : propiedad.habs}</td>
                     <td>1</td>
                     <td>Si</td>
                     <td className="whitespace-no-wrap">
                       {propiedad.moneda === "DOLLAR"
                         ? propiedad.precio_from
-                        : null}{" "}
-                      {propiedad.moneda === "DOLLAR" ? "$" : "S/"}{" "}
+                        : null}
+                      {propiedad.moneda === "DOLLAR" ? "$" : "S/"}
                       {propiedad.moneda === "PEN"
                         ? propiedad.precio_from
                         : null}
@@ -483,7 +498,7 @@ const Propiedades = () => {
                       <div
                         className="foto"
                         style={{
-                          backgroundImage: `url('${propiedad.url_file}')`,
+                          backgroundImage: `url('${propiedad.logo}')`,
                         }}
                       ></div>
                     </td>
@@ -499,25 +514,37 @@ const Propiedades = () => {
                     <td className="ajustes-tabla-celda">
                       <div className="ajustes-tabla-celda-item px-4">
                         <Dropdown
-                          className="text-sm text-bold-font"
+                          className="text-sm text-gray-500"
                           placement="bottomRight"
                           menu={{
                             items: [
                               {
                                 label: (
                                   <Link
-                                    to={`/propiedades/editar/${propiedad.id}`}
-                                    className="pr-6 rounded flex items-center gap-2 text-sm"
+                                    target="_blank"
+                                    to={`/proyectos/${propiedad.id}`}
+                                    className="pr-6 rounded flex items-center gap-2 text-sm text-gray-500"
                                   >
-                                    <FaEdit /> Editar info
+                                    <FaEye /> Ver Propiedad
                                   </Link>
                                 ),
                                 key: 0,
                               },
                               {
                                 label: (
+                                  <Link
+                                    to={`/propiedades/editar/${propiedad.id}`}
+                                    className="pr-6 rounded flex items-center gap-2 text-sm text-gray-500"
+                                  >
+                                    <FaEdit /> Editar info
+                                  </Link>
+                                ),
+                                key: 1,
+                              },
+                              {
+                                label: (
                                   <div
-                                    className="pr-6 rounded flex items-center gap-2 text-sm text-red-500 "
+                                    className="pr-6 rounded flex items-center gap-2 text-sm text-gray-500 text-red-500 "
                                     onClick={(e) =>
                                       handleEliminarProperty(e, propiedad.id)
                                     }
@@ -525,29 +552,29 @@ const Propiedades = () => {
                                     <FaTrash /> Eliminar
                                   </div>
                                 ),
-                                key: 1,
-                              },
-                              {
-                                label: (
-                                  <Link
-                                    to={`/property/${propiedad.id}/models`}
-                                    className="pr-6 rounded flex items-center gap-2 text-sm text-red-500 "
-                                  >
-                                    <BsViewList /> Ver Modelos
-                                  </Link>
-                                ),
                                 key: 2,
                               },
                               {
                                 label: (
                                   <Link
+                                    to={`/property/${propiedad.id}/models`}
+                                    className="pr-6 rounded flex items-center gap-2 text-sm text-gray-500 "
+                                  >
+                                    <BsViewList /> Ver Modelos
+                                  </Link>
+                                ),
+                                key: 3,
+                              },
+                              {
+                                label: (
+                                  <Link
                                     to={`/property/${propiedad.id}/multimedia`}
-                                    className="pr-6 rounded flex items-center gap-2 text-sm text-red-500 "
+                                    className="pr-6 rounded flex items-center gap-2 text-sm text-gray-500 "
                                   >
                                     <FiImage /> Multimedia
                                   </Link>
                                 ),
-                                key: 3,
+                                key: 4,
                               },
                             ],
                           }}
