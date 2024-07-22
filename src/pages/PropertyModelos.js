@@ -8,6 +8,7 @@ import { MdAdd } from "react-icons/md";
 import { TbAdjustments, TbCaretDownFilled } from "react-icons/tb";
 import { NavLink, useParams } from "react-router-dom";
 import LogoUpload from "../components/LogoUpload";
+import { BsViewList } from "react-icons/bs";
 
 const PropertyModelos = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -44,11 +45,11 @@ const PropertyModelos = () => {
     nombre: "",
     categoria: "",
     precioRange: [0, Infinity],
-    area: "",
+    area: 0,
     imagenUrl: "",
-    habs: "",
-    garage: "",
-    banios: "",
+    habs: 0,
+    garage: false,
+    banios: 0,
     moneda: "",
     etapa: "",
   });
@@ -158,11 +159,11 @@ const PropertyModelos = () => {
 
     setVisibleModelos(paginatedProperties);
   };
-  const handleEditarModelo = (e, id) => {
+  const handleEliminarModelo = (e, id) => {
     e.stopPropagation();
     console.log(id);
   };
-  const handleEliminarModelo = (e, id) => {
+  const handleViewUnidades = (e, id) => {
     e.stopPropagation();
     console.log(id);
   };
@@ -191,13 +192,180 @@ const PropertyModelos = () => {
     "Triplex",
     "Penthouse",
   ];
+  // estados para editar modelos
   const [logoFile, setLogoFile] = useState("");
   const [activeModelo, setActiveModelo] = useState(null);
   const [initialModeloAtivo, setinitialModeloAtivo] = useState(null);
   const [isModalOpenModelo, setIsModalOpenModelo] = useState(false);
-  const handleOkModelo = () => {
-    console.log("save");
+
+  // estados para crear nuevo modelo
+  const [logoFileCreate, setLogoFileCreate] = useState("");
+  const [modelCreate, setModelCreate] = useState({
+    propiedad_id: propertyId,
+    nombre: "",
+    categoria: "",
+    habs: 0,
+    precio: 0,
+    area: 0,
+    imagenUrl: "",
+    garage: false,
+    banios: 0,
+    moneda: "PEN",
+    etapa: "En planos",
+  });
+  const sendImagesModelos = async (modelosImages) => {
+    return new Promise(async (resolve, reject) => {
+      const token = session.token;
+      const formData = new FormData();
+
+      formData.append("propertyName", "modelos");
+
+      modelosImages.forEach((img, index) => {
+        formData.append(`modelosImages[${index}]`, img.file);
+      });
+
+      try {
+        const response = await axios.post(`${apiUrl}/uploadimg`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = response.data;
+        resolve(data);
+      } catch (error) {
+        reject(error);
+        console.error("Upload error:", error);
+      }
+    });
   };
+  const createModelosPropiedad = async (newModels) => {
+    return new Promise(async (resolve, reject) => {
+      const token = session.token;
+
+      try {
+        const response = await axios.post(
+          `${apiUrl}/modelospropiedades`,
+          newModels,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response);
+        const data = response.data;
+        resolve(data);
+      } catch (error) {
+        reject(error);
+        console.error("Upload error:", error);
+      }
+    });
+  };
+  const createUnidadesModelos = async (newUnidades) => {
+    return new Promise(async (resolve, reject) => {
+      const token = session.token;
+
+      try {
+        const response = await axios.post(
+          `${apiUrl}/unidadesModelos`,
+          newUnidades,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response);
+        const data = response.data;
+        resolve(data);
+      } catch (error) {
+        reject(error);
+        console.error("Upload error:", error);
+      }
+    });
+  };
+  const [isModalOpenCreate, setIsModalOpenCreate] = useState(false);
+  const handleOkCreate = async () => {
+    console.log("save");
+    console.log(modelCreate);
+    let urlImagen = "";
+    if (modelCreate.imagenUrl !== "") {
+      const sendImagen = await sendImagesModelos([{ file: logoFileCreate }]);
+      console.log(sendImagen);
+      urlImagen = sendImagen.modelosImages[0];
+    }
+    const newModel = { ...modelCreate };
+    newModel.imagenUrl = urlImagen;
+    const modelsData = await createModelosPropiedad([newModel]);
+    console.log(modelsData);
+    if (modelsData.message === "add") {
+      if (unidades.length > 0) {
+        let newUnidades = [...unidades];
+        newUnidades.forEach((unidad) => {
+          unidad.modelo_id = modelsData.ids[0];
+        });
+
+        const unidadesData = await createUnidadesModelos(newUnidades);
+        console.log(unidadesData);
+        message.success("Se registro el modelo y sus unidades correctamente");
+      } else {
+        message.success("Se registro el modelo correctamente");
+      }
+      setLogoFile("");
+      setModelCreate({
+        propiedad_id: propertyId,
+        nombre: "",
+        categoria: "",
+        habs: 0,
+        precio: 0,
+        area: 0,
+        imagenUrl: "",
+        garage: false,
+        banios: 0,
+        moneda: "PEN",
+        etapa: "En planos",
+      });
+      setIsModalOpenCreate(false);
+      await fetchModelosProperty();
+    } else {
+      message.error("Ocurrio un error al crear el modelo, intentelo mas tarde");
+    }
+  };
+  const handleCancelCreate = () => {
+    setLogoFile("");
+    setModelCreate({
+      propiedad_id: propertyId,
+      nombre: "",
+      categoria: "",
+      habs: 0,
+      precio: 0,
+      area: 0,
+      imagenUrl: "",
+      garage: false,
+      banios: 0,
+      moneda: "PEN",
+      etapa: "En planos",
+    });
+    setIsModalOpenCreate(false);
+  };
+  // funciones para crear nuevo modelo
+
+  const abrirModalCreate = (e) => {
+    e.stopPropagation();
+    setIsModalOpenCreate(true);
+  };
+  const handleModelChangeCreate = (key, value) => {
+    setModelCreate((prev) => {
+      const newModelo = { ...prev, [key]: value };
+
+      return newModelo;
+    });
+  };
+
+  // funciones para editar modelo
   const compareStates = (state1, state2) => {
     return JSON.stringify(state1) === JSON.stringify(state2);
   };
@@ -333,6 +501,39 @@ const PropertyModelos = () => {
       return newModelo;
     });
   };
+  const [prefijo, setPrefijo] = useState("");
+  const [numberUnidades, setNumberUnidades] = useState(0);
+  const [unidades, setUnidades] = useState([]);
+  const handleCreateUnidades = () => {
+    const numero = numberUnidades;
+    console.log(numero);
+    let newsUnidades = [];
+    if (numero === 0) {
+      message.warning("El numero de unidades debe ser mayor a 0");
+    } else {
+      for (let index = 0; index < numero; index++) {
+        let newUnidad = {
+          modelo_id: "",
+          nombre: `${prefijo}${index + 1}`,
+          status: "Disponible",
+        };
+        newsUnidades.push(newUnidad);
+      }
+      setUnidades(newsUnidades);
+    }
+  };
+  const handleResetUnidades = () => {
+    setUnidades([]);
+    setNumberUnidades(0);
+    setPrefijo("");
+  };
+  const handleUnitChange = (unitIndex, value) => {
+    const updateUnidades = unidades.map((unidad, i) =>
+      i === unitIndex ? { ...unidad, nombre: value } : unidad
+    );
+    setUnidades(updateUnidades);
+  };
+
   return (
     <div className="w-full p-6 app-container-sections">
       <div
@@ -383,19 +584,19 @@ const PropertyModelos = () => {
           >
             <TbAdjustments />
           </button>
-          <NavLink className="" to={"/propiedades/nuevo"}>
-            <button className="btn-new ml-[12px] h-[46px] flex gap-2 items-center">
-              <MdAdd className="text-white" />
-              <span className="mobile-hide">Añadir modelo</span>
-            </button>
-          </NavLink>
+          <button
+            onClick={(e) => abrirModalCreate(e)}
+            className="btn-new ml-[12px] h-[46px] flex gap-2 items-center"
+          >
+            <MdAdd className="text-white" />
+            <span className="mobile-hide">Añadir modelo</span>
+          </button>
         </div>
       </div>
       <Modal
         footer={null}
         title="Editar modelo"
         open={isModalOpenModelo}
-        onOk={handleOkModelo}
         onCancel={handleCancelModelo}
       >
         {activeModelo !== null ? (
@@ -552,6 +753,240 @@ const PropertyModelos = () => {
           </button>
         </div>
       </Modal>
+      <Modal
+        footer={null}
+        title="Crear modelo"
+        open={isModalOpenCreate}
+        onOk={handleOkCreate}
+        onCancel={handleCancelCreate}
+      >
+        <div className="model grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 relative">
+          <div className="md:col-span-1">
+            <label className="text-sm w-full block font-medium  mb-4 ">
+              Subir Imagen
+            </label>
+            <div className="w-full flex items-center gap-3">
+              <LogoUpload
+                setLogoFile={setLogoFileCreate}
+                logo={modelCreate?.imagenUrl}
+                setLogo={(imagenUrl) =>
+                  setModelCreate((prevState) => ({
+                    ...prevState,
+                    imagenUrl,
+                  }))
+                }
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-sm w-full block font-medium mb-4 ">
+              Categoría
+            </label>
+            <select
+              className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+              value={modelCreate?.categoria}
+              onChange={(e) =>
+                handleModelChangeCreate("categoria", e.target.value)
+              }
+            >
+              {categorias.map((categoria, index) => (
+                <option key={index} value={categoria}>
+                  {categoria}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="text-sm w-full block font-medium mb-4 ">
+              Nombre
+            </label>
+            <input
+              className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+              type="text"
+              value={modelCreate?.nombre}
+              onChange={(e) =>
+                handleModelChangeCreate("nombre", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label className="text-sm w-full block font-medium mb-4 ">
+              Etapa
+            </label>
+            <select
+              name=""
+              id="estado_modelo"
+              className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+              value={modelCreate?.etapa}
+              onChange={(e) => handleModelChangeCreate("etapa", e.target.value)}
+            >
+              <option value="En planos">En planos</option>
+              <option value="Construccion">Construccion</option>
+              <option value="Entregado">Entregado</option>
+            </select>
+          </div>
+          <div className="col-span-2">
+            <label className="text-sm w-full block font-medium mb-4 ">
+              Precio Desde
+            </label>
+            <div className="w-full flex">
+              <select
+                value={modelCreate?.moneda}
+                onChange={(e) =>
+                  handleModelChangeCreate("moneda", e.target.value)
+                }
+                name=""
+                className="bg-gray-200 rounded px-3 py-2 text-sm"
+                id="moneda"
+              >
+                <option value="PEN">S/</option>
+                <option value="DOLLAR">$</option>
+              </select>
+              <input
+                className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+                type="number"
+                value={modelCreate?.precio}
+                onChange={(e) =>
+                  handleModelChangeCreate("precio", e.target.value)
+                }
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-sm w-full block font-medium mb-4">
+              Área Desde
+            </label>
+            <input
+              className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+              type="number"
+              value={modelCreate?.area}
+              onChange={(e) => handleModelChangeCreate("area", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-sm w-full block font-medium mb-4">
+              N° Habitaciones
+            </label>
+            <input
+              className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+              type="number"
+              value={modelCreate?.habs}
+              onChange={(e) => handleModelChangeCreate("habs", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-sm w-full block font-medium mb-4">
+              Garage
+            </label>
+            <Switch
+              value={Number(modelCreate?.garage) === 1 ? true : false}
+              onChange={(e) => handleModelChangeCreate("garage", e)}
+            />
+          </div>
+          <div>
+            <label className="text-sm w-full block font-medium mb-4">
+              Baños
+            </label>
+            <input
+              className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+              type="number"
+              value={modelCreate?.banios}
+              onChange={(e) =>
+                handleModelChangeCreate("banios", e.target.value)
+              }
+            />
+          </div>
+          <div>
+            <label className="text-sm w-full block font-medium mb-4">
+              Unidades
+            </label>
+            <div className="flex flex-grap gap-3 items-start">
+              <div>
+                <input
+                  className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+                  type="text"
+                  value={prefijo}
+                  onChange={(e) => setPrefijo(e.target.value)}
+                />
+                <label htmlFor="">Prefijo</label>
+              </div>
+              <div>
+                <input
+                  className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+                  type="number"
+                  value={numberUnidades}
+                  onChange={(e) => setNumberUnidades(e.target.value)}
+                />
+                <label htmlFor="">Cantidad</label>
+              </div>
+              <button
+                onClick={() => handleCreateUnidades()}
+                className="p-2 text-white bg-dark-purple rounded whitespace-nowrap text-xs inline-block h-max"
+              >
+                Crear
+              </button>
+              <button
+                onClick={() => handleResetUnidades()}
+                className="p-2 text-white bg-orange-500 rounded whitespace-nowrap text-xs inline-block h-max"
+              >
+                Limpiar
+              </button>
+            </div>
+          </div>
+        </div>
+        <div
+          className={`w-full grid-cols-1 gap-2 mt-4 bg-white px-4 py-3 rounded md:col-span-4 ${
+            unidades.length > 0 ? "" : "hidden"
+          }`}
+        >
+          <label className="text-sm w-full block font-medium my-4">
+            Unidades
+          </label>
+          {unidades.map((unit, unitIndex) => (
+            <div key={unitIndex} className="flex gap-2 w-full">
+              <div className="">
+                <label className="text-sm w-full block font-medium">#</label>
+                <span>{unitIndex + 1}</span>
+              </div>
+              <div className="w-full">
+                <label className="text-sm w-full block font-medium">
+                  Nombre
+                </label>
+                <input
+                  className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+                  type="text"
+                  value={unit.nombre}
+                  onChange={(e) => handleUnitChange(unitIndex, e.target.value)}
+                />
+              </div>
+              <div className="w-full">
+                <label className="text-sm w-full block font-medium">
+                  status
+                </label>
+                <select
+                  className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
+                  name=""
+                  id="unidades"
+                  value={unit.status}
+                  onChange={(e) => handleUnitChange(unitIndex, e.target.value)}
+                >
+                  <option value="Disponible">Disponible</option>
+                  <option value="Separado">Separado</option>
+                  <option value="Vendido">Vendido</option>
+                </select>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={() => handleOkCreate()}
+            className="bg-dark-purple text-white p-3 rounded"
+          >
+            Crear Modelo
+          </button>
+        </div>
+      </Modal>
       <div className="box-table">
         <table
           className="inmocms-table"
@@ -579,6 +1014,7 @@ const PropertyModelos = () => {
               <td>Garage </td>
               <td>Banios </td>
               <td>Etapa </td>
+              <td>Unidades </td>
               <td className="ajustes-tabla-celda"></td>
             </tr>
           </thead>
@@ -627,10 +1063,11 @@ const PropertyModelos = () => {
                       ></div>
                     </td>
                     <td>{modelo.habs}</td>
-                    <td>{modelo.garage}</td>
+                    <td>{Number(modelo.garage) === 1 ? "SI" : "NO"}</td>
                     <td>{modelo.banios}</td>
 
                     <td>{modelo.etapa}</td>
+                    <td>{modelo.cantidad_unidades_totales} unidades <br /> {modelo.cantidad_unidades_disponibles} disponibles</td>
 
                     <td className="ajustes-tabla-celda">
                       <div className="ajustes-tabla-celda-item px-4">
@@ -665,6 +1102,19 @@ const PropertyModelos = () => {
                                 ),
                                 key: 1,
                               },
+                              {
+                                label: (
+                                  <div
+                                    className="pr-6 rounded flex items-center gap-2 text-sm text-gray-900 "
+                                    onClick={(e) =>
+                                      handleViewUnidades(e, modelo.id)
+                                    }
+                                  >
+                                    <BsViewList /> Ver Unidades
+                                  </div>
+                                ),
+                                key: 2,
+                              },
                             ],
                           }}
                           trigger={["click"]}
@@ -685,6 +1135,11 @@ const PropertyModelos = () => {
               })}
           </tbody>
         </table>
+        {visibleModelos.length === 0 ? (
+          <p className="w-full text-center text-xs py-4">
+            No hay modelos creados para esta propiedad
+          </p>
+        ) : null}
       </div>
       <div className="table-controls">
         <div className="page">

@@ -589,67 +589,94 @@ const ProyectosPage = () => {
                     Modelos de {propiedad.tipo}
                   </h1>
                   <div className="w-full">
-                    <div className=" max-h-[620px] overflow-y-auto divide-y-2 flex flex-col gap-4">
-                      {modelos.length > 0 &&
-                        modelos.map((model, index) => {
-                          return (
-                            <div className="w-full py-4 grid grid-cols-6 gap-3">
-                              <div className="w-full">
-                                <img
-                                  className="w-full"
-                                  src={model.imagenUrl}
-                                  alt=""
-                                />
-                              </div>
-                              <div className="col-span-4 w-full">
-                                <div className="w-full top-info overflow-x-auto flex flex-wrap mb-4">
-                                  <span className="px-4 text-sm md:w-[34%]">
-                                    Modelo
-                                  </span>
+                    <div className="max-h-[620px] overflow-y-auto divide-y-2 flex flex-col gap-4">
+                      {modelos
+                        .filter(
+                          (model) => model.cantidad_unidades_disponibles > 0
+                        )
+                        .map((model, index) => (
+                          <div
+                            key={index}
+                            className="w-full py-4 grid grid-cols-6 gap-3"
+                          >
+                            <div className="w-full">
+                              <img
+                                className="w-full"
+                                src={model.imagenUrl}
+                                alt=""
+                              />
+                            </div>
+                            <div className="col-span-4 w-full">
+                              <div className="w-full top-info overflow-x-auto flex flex-wrap mb-4">
+                                <span className="px-4 text-sm md:w-[34%]">
+                                  Modelo
+                                </span>
+                                {model.habs === 0 ? null : (
                                   <span className="px-4 text-sm md:w-[14%]">
                                     Dorm.
                                   </span>
-                                  <span className="px-4 text-sm md:w-[19%]">
-                                    Area
+                                )}
+                                {model.banios === 0 ? null : (
+                                  <span className="px-4 text-sm md:w-[14%]">
+                                    Baños
                                   </span>
-                                  <span className="px-4 text-sm md:w-[28%]">
-                                    Precio desde
+                                )}
+                                {Number(model.garage) === 0 ? null : (
+                                  <span className="px-4 text-sm md:w-[14%]">
+                                    Garage
                                   </span>
-                                </div>
-                                <div className="w-full bottom-info overflow-x-auto flex flex-wrap">
-                                  <span className="px-4 text-sm font-bold md:w-[34%]">
-                                    {model.nombre}
-                                  </span>
+                                )}
+                                <span className="px-4 text-sm md:w-[19%]">
+                                  Area
+                                </span>
+                                <span className="px-4 text-sm md:w-[28%]">
+                                  Precio desde
+                                </span>
+                              </div>
+                              <div className="w-full bottom-info overflow-x-auto flex flex-wrap">
+                                <span className="px-4 text-sm font-bold md:w-[34%]">
+                                  {model.nombre}
+                                </span>
+                                {model.habs === 0 ? null : (
                                   <span className="px-4 text-sm font-bold md:w-[14%]">
                                     {model.habs}
                                   </span>
-                                  <span className="px-4 text-sm font-bold md:w-[19%]">
-                                    {model.area} m2
+                                )}
+                                {model.banios === 0 ? null : (
+                                  <span className="px-4 text-sm font-bold md:w-[14%]">
+                                    {model.banios}
                                   </span>
-                                  <span className="px-4 text-sm font-bold md:w-[28%]">
-                                    {model.moneda === "DOLLAR"
-                                      ? model.precio
-                                      : null}{" "}
-                                    {model.moneda === "DOLLAR" ? "$" : "S/"}{" "}
-                                    {model.moneda === "PEN"
-                                      ? model.precio
-                                      : null}
+                                )}
+                                {Number(model.garage) === 0 ? null : (
+                                  <span className="px-4 text-sm font-bold md:w-[14%]">
+                                    {Number(model.garage) === 1 ? "SI" : "NO"}
                                   </span>
-                                </div>
-                              </div>
-                              <div className="w-full">
-                                <button
-                                  style={{
-                                    background: settings.color_primary,
-                                  }}
-                                  className="rounded font-bold text-white p-2 text-sm"
-                                >
-                                  Cotizar
-                                </button>
+                                )}
+                                <span className="px-4 text-sm font-bold md:w-[19%]">
+                                  {model.area} m2
+                                </span>
+                                <span className="px-4 text-sm font-bold md:w-[28%]">
+                                  {model.moneda === "DOLLAR"
+                                    ? model.precio
+                                    : null}{" "}
+                                  {model.moneda === "DOLLAR" ? "$" : "S/"}{" "}
+                                  {model.moneda === "PEN" ? model.precio : null}
+                                </span>
                               </div>
                             </div>
-                          );
-                        })}
+                            <div className="w-full">
+                              <button
+                                style={{
+                                  background: settings.color_primary,
+                                }}
+                                className="rounded font-bold text-white p-2 text-sm"
+                              >
+                                Cotizar {model.cantidad_unidades_disponibles}{" "}
+                                unidades
+                              </button>
+                            </div>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </div>

@@ -77,68 +77,75 @@ const Propiedades = () => {
     }
   };
   const applyFilters = () => {
-    const filteredProperties = filterPropiedades.filter((propiedad) => {
-      const searchRegex = new RegExp(searchTerm, "i");
+    const regex = /^[a-zA-Z0-9\s]*$/; // Permite solo letras, números y espacios
+    const bol = regex.test(searchTerm) ? searchTerm : "";
 
-      const matchSearch = Object.values(propiedad).some((value) =>
-        searchRegex.test(value.toString())
-      );
+    if (bol === "") {
+      const filteredProperties = filterPropiedades.filter((propiedad) => {
+        const searchRegex = new RegExp(searchTerm, "i");
 
-      const matchFilters =
-        (!filters.tipo || propiedad.tipo === filters.tipo) &&
-        propiedad.precio_from >= filters.precioRange[0] &&
-        propiedad.precio_from <= filters.precioRange[1] &&
-        (!filters.pais || propiedad.pais === filters.pais) &&
-        (!filters.region || propiedad.region_name === filters.region) &&
-        (!filters.provincia ||
-          propiedad.provincia_name === filters.provincia) &&
-        (!filters.distrito || propiedad.distrito_name === filters.distrito) &&
-        (!filters.fechaCreatedRange[0] ||
-          ((dayjs(propiedad.fecha_created).isAfter(
-            filters.fechaCreatedRange[0],
-            "day"
-          ) ||
-            dayjs(propiedad.fecha_created).isSame(
+        const matchSearch = Object.values(propiedad).some((value) =>
+          searchRegex.test(value.toString())
+        );
+
+        const matchFilters =
+          (!filters.tipo || propiedad.tipo === filters.tipo) &&
+          propiedad.precio_from >= filters.precioRange[0] &&
+          propiedad.precio_from <= filters.precioRange[1] &&
+          (!filters.pais || propiedad.pais === filters.pais) &&
+          (!filters.region || propiedad.region_name === filters.region) &&
+          (!filters.provincia ||
+            propiedad.provincia_name === filters.provincia) &&
+          (!filters.distrito || propiedad.distrito_name === filters.distrito) &&
+          (!filters.fechaCreatedRange[0] ||
+            ((dayjs(propiedad.fecha_created).isAfter(
               filters.fechaCreatedRange[0],
-              "day"
-            )) &&
-            (dayjs(propiedad.fecha_created).isBefore(
-              filters.fechaCreatedRange[1],
               "day"
             ) ||
               dayjs(propiedad.fecha_created).isSame(
+                filters.fechaCreatedRange[0],
+                "day"
+              )) &&
+              (dayjs(propiedad.fecha_created).isBefore(
                 filters.fechaCreatedRange[1],
                 "day"
-              )))) &&
-        (!filters.fechaEntregaRange[0] ||
-          ((dayjs(propiedad.fecha_entrega).isAfter(
-            filters.fechaEntregaRange[0],
-            "day"
-          ) ||
-            dayjs(propiedad.fecha_entrega).isSame(
+              ) ||
+                dayjs(propiedad.fecha_created).isSame(
+                  filters.fechaCreatedRange[1],
+                  "day"
+                )))) &&
+          (!filters.fechaEntregaRange[0] ||
+            ((dayjs(propiedad.fecha_entrega).isAfter(
               filters.fechaEntregaRange[0],
-              "day"
-            )) &&
-            (dayjs(propiedad.fecha_entrega).isBefore(
-              filters.fechaEntregaRange[1],
               "day"
             ) ||
               dayjs(propiedad.fecha_entrega).isSame(
+                filters.fechaEntregaRange[0],
+                "day"
+              )) &&
+              (dayjs(propiedad.fecha_entrega).isBefore(
                 filters.fechaEntregaRange[1],
                 "day"
-              ))));
+              ) ||
+                dayjs(propiedad.fecha_entrega).isSame(
+                  filters.fechaEntregaRange[1],
+                  "day"
+                ))));
 
-      return matchSearch && matchFilters;
-    });
-    detectarTotalPages(filteredProperties);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    // setCurrentPage(1);
-    const paginatedProperties = filteredProperties.slice(
-      startIndex,
-      startIndex + itemsPerPage
-    );
+        return matchSearch && matchFilters;
+      });
+      detectarTotalPages(filteredProperties);
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      // setCurrentPage(1);
+      const paginatedProperties = filteredProperties.slice(
+        startIndex,
+        startIndex + itemsPerPage
+      );
 
-    setVisibleProperties(paginatedProperties);
+      setVisibleProperties(paginatedProperties);
+    } else {
+      searchTerm(bol);
+    }
   };
 
   // useEffect para manejar el filtrado y paginación
