@@ -26,7 +26,7 @@ const LogoUpload = ({ logo, setLogo, setLogoFile }) => {
         {logo ? (
           <>
             <img
-              className="w-[80px] h-[80px] p-1 rounded-full"
+              className="w-[80px] h-[80px] object-cover shadow-md p-1 rounded-full"
               src={logo}
               alt="Profile"
             />

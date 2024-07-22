@@ -302,6 +302,7 @@ const AddPropiedad = () => {
       } else {
         // Intercambio de portada por imagen de la galería
         const droppedImage = newImages[dropIndex];
+
         newImages[dropIndex] = draggedImage;
         setCoverImage(droppedImage);
       }
@@ -311,6 +312,7 @@ const AddPropiedad = () => {
       if (dropIndex === -1) {
         // Intercambio de imagen de la galería por portada
         const currentCoverImage = coverImage;
+
         setCoverImage(draggedImage);
         if (currentCoverImage) {
           newImages.splice(draggedIndex, 0, currentCoverImage);
@@ -332,7 +334,7 @@ const AddPropiedad = () => {
       const formData = new FormData();
       const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
 
-      formData.append("propertyName", propertyName);
+      formData.append("propertyName", "covers");
       if (coverImage) {
         formData.append("coverImage", coverImage.file);
       }
@@ -360,7 +362,7 @@ const AddPropiedad = () => {
       const formData = new FormData();
       const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
 
-      formData.append("propertyName", propertyName);
+      formData.append("propertyName", "gallery");
 
       galleryImages.forEach((img, index) => {
         formData.append(`galleryImages[${index}]`, img.file);
@@ -389,7 +391,7 @@ const AddPropiedad = () => {
       const formData = new FormData();
       const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
 
-      formData.append("propertyName", propertyName);
+      formData.append("propertyName", "modelos");
 
       modelosImages.forEach((img, index) => {
         formData.append(`modelosImages[${index}]`, img.file);

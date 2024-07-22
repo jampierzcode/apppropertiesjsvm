@@ -15,6 +15,9 @@ import LayoutPages from "./components/LayoutPages";
 import Clientes from "./pages/Clientes";
 import ProyectosPage from "./pages/ProyectosPage";
 import EditPropiedad from "./pages/EditPropiedad";
+import Modelos from "./components/Modelos";
+import PropertyModelos from "./pages/PropertyModelos";
+import PropertyMultimedia from "./pages/PropertyMultimedia";
 
 function App() {
   return (
@@ -42,6 +45,26 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <EditPropiedad />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/property/:propertyId/models"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PropertyModelos />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/property/:propertyId/multimedia"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <PropertyMultimedia />
               </Layout>
             </ProtectedRoute>
           }

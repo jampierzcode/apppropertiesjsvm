@@ -11,7 +11,7 @@ const ListPropiedadesPage = ({ settings, propiedades }) => {
           <Link
             to={`/proyectos/${prop.id}`}
             key={index}
-            className="w-full overflow-hidden rounded-lg shadow relative"
+            className="w-full overflow-hidden rounded-lg shadow-md relative border border-gray-400"
           >
             <div className="absolute top-[10%] left-0 ">
               <p
@@ -31,7 +31,7 @@ const ListPropiedadesPage = ({ settings, propiedades }) => {
               />
             </div>
             <div className="px-4 py-4 bg-white">
-              <p className="text-sm text-bold-font">{prop.tipo}</p>
+              <p className="text-sm text-bold-font">Proyecto - {prop.tipo}</p>
               <h1
                 style={{ color: settings.color_primary }}
                 className="font-bold text-xl"
@@ -41,37 +41,40 @@ const ListPropiedadesPage = ({ settings, propiedades }) => {
               <div className="flex gap-1">
                 <FaMapMarkerAlt className="text-bold-font" />
                 <p className="text-xs text-bold-font">
+                  <span className="font-bold text-sm">{prop.exactAddress}</span>
+                  <br />
                   {prop.region_name}
-                  {">"}
+                  {", "}
                   {prop.provincia_name}
-                  {">"} {prop.distrito_name}
-                  {">"} <br />
-                  {prop.exactAddress}
+                  {", "} {prop.distrito_name}
                 </p>
               </div>
-              <div className="mt-4 w-full flex flex-wrap gap-3">
+              <div className="mt-4 w-full flex flex-wrap gap-3 items-center">
                 {prop.tipo !== "Lote" ? (
                   <div>
-                    <FaBed className="text-bold-font text-lg" />
-                    <p className="text-sm text-bold-font">
-                      Habitaciones: {prop.habs}
-                    </p>
+                    <FaBed className="text-gray-700 text-lg" />
+                    <p className="text-sm text-gray-700">{prop.habs}</p>
                   </div>
                 ) : null}
                 {prop.tipo !== "Lote" ? (
                   <div>
-                    <FaBath className="text-bold-font text-lg" />
-                    <p className="text-sm text-bold-font">
-                      Baños: {prop.banios}
-                    </p>
+                    <FaBath className="text-gray-700 text-lg" />
+                    <p className="text-sm text-gray-700">{prop.banios}</p>
                   </div>
                 ) : null}
                 <div>
-                  <FaVectorSquare className="text-bold-font text-lg" />
-                  <p className="text-sm text-bold-font">
-                    Area: {prop.area_from} m2
-                  </p>
+                  <FaVectorSquare className="text-gray-700 text-lg" />
+                  <p className="text-sm text-gray-700">{prop.area_from} m2</p>
                 </div>
+                <button
+                  onClick={() => {
+                    window.location.href = `/proyectos/${prop.id}`;
+                  }}
+                  style={{ background: settings.color_secondary }}
+                  className="whitespace-nowrap inline-block h-max p-2 rounded   text-white font-bold text-xs"
+                >
+                  Ver proyecto
+                </button>
               </div>
             </div>
           </Link>

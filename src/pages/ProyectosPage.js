@@ -226,6 +226,17 @@ const ProyectosPage = () => {
       );
     }
   };
+  const createMarkup = (text) => {
+    // Verifica si el texto tiene saltos de línea
+    if (String(text).includes("\n")) {
+      // Si tiene saltos de línea, reemplázalos con <br />
+      const formattedText = text.replace(/\n/g, "<br />");
+      return { __html: formattedText };
+    } else {
+      // Si no tiene saltos de línea, retorna el texto tal cual
+      return { __html: text };
+    }
+  };
 
   return (
     <>
@@ -408,10 +419,10 @@ const ProyectosPage = () => {
                   >
                     Descripcion de la propiedad
                   </h1>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="grid grid-cols-1 gap-4 mt-4">
                     <div>
                       <iframe
-                        className="w-full max-w-[500px] mx-auto h-[125px] md:h-[200px]"
+                        className="w-full h-[300px]"
                         id="urlvideoY"
                         src={obtenerCodigoVideo(
                           propiedad.length === 0
@@ -424,9 +435,12 @@ const ProyectosPage = () => {
                         allowFullScreen
                       />
                     </div>
-                    <p className="text-sm text-light-font py-4">
-                      {propiedad.descripcion}
-                    </p>
+                    <p
+                      className="text-sm text-light-font py-4"
+                      dangerouslySetInnerHTML={createMarkup(
+                        propiedad?.descripcion
+                      )}
+                    ></p>
                   </div>
                 </div>
               </div>

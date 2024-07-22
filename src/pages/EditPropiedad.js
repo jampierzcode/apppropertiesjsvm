@@ -4,11 +4,9 @@ import { GiGps } from "react-icons/gi";
 import { MdNumbers } from "react-icons/md";
 import MapComponent from "../components/MapComponent";
 import axios from "axios";
-import { FloatButton, Select, Switch, message } from "antd";
-import { FaCalendar, FaInfo, FaSave, FaTimes, FaUsers } from "react-icons/fa";
+import { Select, Switch, message } from "antd";
+import { FaCalendar, FaTimes } from "react-icons/fa";
 import { BsBoundingBoxCircles } from "react-icons/bs";
-import Amenities from "../components/Amenities";
-import Modelos from "../components/Modelos";
 import { useParams } from "react-router-dom";
 import AmenitiesEdit from "../components/AmenitiesEdit";
 
@@ -21,14 +19,15 @@ const EditPropiedad = () => {
   const session = JSON.parse(sessionStorage.getItem("session"));
   const mapRef = useRef(); // Coordenadas por defecto (Madrid)
   const [loadingCreate, setLoadingCreate] = useState(false);
-  // estados de publicacion
-  const [statusPublicacion, setStatusPublicacion] = useState("Borrador");
   // ESTADOS DE DATOS BASICOS propiedad
   const [propiedad, setPropiedad] = useState(null);
   const [initialData, setInitialData] = useState(null);
   // ESTADOS DE DATOS BASICOS propiedad amenidades
   const [amenidades, setAmenidades] = useState([]);
   const [initialAmenidades, setInitialAmenidades] = useState([]);
+  // ESTADOS DE DATOS BASICOS propiedad multimedia
+  const [multimedia, setMultimedia] = useState([]);
+  const [initialMultimedia, setInitialMultimedia] = useState([]);
 
   useEffect(() => {
     setLoadingCreate(true);
@@ -50,7 +49,7 @@ const EditPropiedad = () => {
         setAddress(newAd);
         setTimeout(() => {
           setLoadingCreate(false);
-        }, 3000);
+        }, 1000);
       } catch (error) {
         console.error("Error al obtener los datos de la propiedad:", error);
       }
@@ -77,14 +76,12 @@ const EditPropiedad = () => {
   }, [apiUrl, query, propiedad]);
 
   function obtenerCodigoVideo(url) {
-    console.log(url);
     if (url === undefined) {
       return "";
     } else {
       const match = url.match(
         /(?:youtu\.be\/|youtube\.com\/(?:.*v\/|.*&v=|.*embed\/|.*be\/|.*watch\?v=))([^"&?\/\s]{11})/
       );
-      console.log(match);
       let videosrc = construirURLDeEmbed(match && match[1] ? match[1] : null);
 
       return videosrc;
@@ -108,20 +105,6 @@ const EditPropiedad = () => {
     postalCode: "",
     exactAddress: "",
   });
-  console.log(address);
-  // useEffect(() => {
-  //   if (propiedad) {
-  //     let newAd = {
-  //       country: "Perú",
-  //       province: propiedad?.region_name,
-  //       locality: propiedad?.provincia_name,
-  //       zone: propiedad?.distrito_name,
-  //       postalCode: propiedad?.postalcode,
-  //       exactAddress: propiedad?.exactAddress,
-  //     };
-  //     setAddress(newAd);
-  //   }
-  // }, [propiedad]);
 
   useEffect(() => {
     const fetchRegions = async () => {
@@ -209,12 +192,9 @@ const EditPropiedad = () => {
           fullAddress
         )}&format=json&limit=1`
       );
-      console.log(response);
-      console.log(fullAddress);
       if (response.data.length > 0) {
         const { lat, lon } = response.data[0];
         const newPos = [parseFloat(lat), parseFloat(lon)];
-        console.log(newPos);
 
         setPropiedad((prevState) => ({
           ...prevState,
@@ -269,10 +249,8 @@ const EditPropiedad = () => {
     const response = await axios.get(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
     );
-    console.log(response.data);
     if (response.data) {
       const { road, town, region, state, postcode } = response.data.address;
-      console.log(road, town, region, state, postcode);
 
       setPropiedad((prevState) => ({
         ...prevState,
@@ -292,235 +270,17 @@ const EditPropiedad = () => {
       );
     }
   };
-  console.log(propiedad);
   const setPositionAndAdress = (latlng) => {
-    console.log("entro aqui");
     setPropiedad((prevState) => ({
       ...prevState,
       position_locate: JSON.stringify(latlng),
     }));
     handleMapClick(latlng);
   };
-  const [coverImage, setCoverImage] = useState(null);
-  const [galleryImages, setGalleryImages] = useState([]);
-  const [draggedIndex, setDraggedIndex] = useState(null);
-  const [dropIndex, setDropIndex] = useState(null);
 
-  const handleCoverImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setCoverImage({ file, url });
-    }
-  };
-
-  const handleGalleryImagesChange = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-    }));
-    setGalleryImages((prev) => [...prev, ...newImages]);
-  };
-
-  const handleRemoveCoverImage = () => {
-    setCoverImage(null);
-  };
-
-  const handleRemoveGalleryImage = (index) => {
-    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleDragStart = (index) => {
-    setDraggedIndex(index);
-    setDropIndex(null);
-  };
-
-  const handleDragEnter = (index) => {
-    setDropIndex(index);
-  };
-
-  const handleDragLeave = () => {
-    setDropIndex(null);
-  };
-
-  const handleDrop = () => {
-    if (draggedIndex === null || dropIndex === null) return;
-
-    const newImages = [...galleryImages];
-    let draggedImage;
-
-    if (draggedIndex === -1) {
-      // Si la imagen arrastrada es la imagen de portada
-      draggedImage = coverImage;
-      if (dropIndex === -1) {
-        // Intercambio de portada por portada (no es necesario hacer nada)
-        return;
-      } else {
-        // Intercambio de portada por imagen de la galería
-        const droppedImage = newImages[dropIndex];
-        newImages[dropIndex] = draggedImage;
-        setCoverImage(droppedImage);
-      }
-    } else {
-      // Si la imagen arrastrada es de la galería
-      draggedImage = newImages.splice(draggedIndex, 1)[0];
-      if (dropIndex === -1) {
-        // Intercambio de imagen de la galería por portada
-        const currentCoverImage = coverImage;
-        setCoverImage(draggedImage);
-        if (currentCoverImage) {
-          newImages.splice(draggedIndex, 0, currentCoverImage);
-        }
-      } else {
-        // Intercambio de imagen de la galería por imagen de la galería
-        newImages.splice(dropIndex, 0, draggedImage);
-      }
-    }
-
-    setGalleryImages(newImages);
-    setDraggedIndex(null);
-    setDropIndex(null);
-  };
-
-  const sendCoverPropiedad = async (nombrePropiedad) => {
-    return new Promise(async (resolve, reject) => {
-      const token = session.token;
-      const formData = new FormData();
-      const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
-
-      formData.append("propertyName", propertyName);
-      if (coverImage) {
-        formData.append("coverImage", coverImage.file);
-      }
-
-      try {
-        const response = await axios.post(`${apiUrl}/uploadimg`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response);
-        const data = response.data;
-        resolve(data);
-        console.log("Upload response:", data);
-      } catch (error) {
-        reject(error);
-        console.error("Upload error:", error);
-      }
-    });
-  };
-  const sendGalleryPropiedad = async (nombrePropiedad) => {
-    return new Promise(async (resolve, reject) => {
-      const token = session.token;
-      const formData = new FormData();
-      const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
-
-      formData.append("propertyName", propertyName);
-
-      galleryImages.forEach((img, index) => {
-        formData.append(`galleryImages[${index}]`, img.file);
-      });
-
-      try {
-        const response = await axios.post(`${apiUrl}/uploadimg`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response);
-        const data = response.data;
-        resolve(data);
-        console.log("Upload response:", data);
-      } catch (error) {
-        reject(error);
-        console.error("Upload error:", error);
-      }
-    });
-  };
-  const sendImagesModelos = async (nombrePropiedad, modelosImages) => {
-    return new Promise(async (resolve, reject) => {
-      const token = session.token;
-      const formData = new FormData();
-      const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
-
-      formData.append("propertyName", propertyName);
-
-      modelosImages.forEach((img, index) => {
-        formData.append(`modelosImages[${index}]`, img.file);
-      });
-
-      try {
-        const response = await axios.post(`${apiUrl}/uploadimg`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log(response);
-        const data = response.data;
-        resolve(data);
-        console.log("Upload response:", data);
-      } catch (error) {
-        reject(error);
-        console.error("Upload error:", error);
-      }
-    });
-  };
-  const createPropiedad = async (newPropiedad) => {
-    return new Promise(async (resolve, reject) => {
-      const token = session.token;
-
-      try {
-        const response = await axios.post(
-          `${apiUrl}/propiedades`,
-          newPropiedad,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log(response);
-        const data = response.data;
-        resolve(data);
-      } catch (error) {
-        reject(error);
-        console.error("Upload error:", error);
-      }
-    });
-  };
-  const createMultimediaPropiedad = async (newMultimedia) => {
-    return new Promise(async (resolve, reject) => {
-      const token = session.token;
-
-      try {
-        const response = await axios.post(
-          `${apiUrl}/multimediapropiedades`,
-          newMultimedia,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log(response);
-        const data = response.data;
-        resolve(data);
-      } catch (error) {
-        reject(error);
-        console.error("Upload error:", error);
-      }
-    });
-  };
   const createAmenidadesPropiedad = async (newAmenities) => {
     return new Promise(async (resolve, reject) => {
       const token = session.token;
-      console.log(token);
 
       try {
         const response = await axios.post(
@@ -533,55 +293,6 @@ const EditPropiedad = () => {
             },
           }
         );
-        console.log(response);
-        const data = response.data;
-        resolve(data);
-      } catch (error) {
-        reject(error);
-        console.error("Upload error:", error);
-      }
-    });
-  };
-  const createModelosPropiedad = async (newModels) => {
-    return new Promise(async (resolve, reject) => {
-      const token = session.token;
-
-      try {
-        const response = await axios.post(
-          `${apiUrl}/modelospropiedades`,
-          newModels,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log(response);
-        const data = response.data;
-        resolve(data);
-      } catch (error) {
-        reject(error);
-        console.error("Upload error:", error);
-      }
-    });
-  };
-  const createUnidadesModelos = async (newUnidades) => {
-    return new Promise(async (resolve, reject) => {
-      const token = session.token;
-
-      try {
-        const response = await axios.post(
-          `${apiUrl}/unidadesModelos`,
-          newUnidades,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log(response);
         const data = response.data;
         resolve(data);
       } catch (error) {
@@ -591,149 +302,13 @@ const EditPropiedad = () => {
     });
   };
   // section amenitites
-  const [models, setModels] = useState([]);
-  // const handleSendProperty = async () => {
-  //   setLoadingCreate(false);
-  //   let newPropiedad = {
-  //     nombre: nombrePropiedad,
-  //     tipo: tipoPropiedad,
-  //     purpose: proposito,
-  //     descripcion: descripcionPropiedad,
-  //     video_descripcion: videoDescripcionPropiedad,
-  //     link_extra: linkExtra,
-  //     region: selectedProvince,
-  //     provincia: selectedLocality,
-  //     distrito: selectedZone,
-  //     exactAddress: exactAddress,
-  //     postalcode: postalCode,
-  //     position_locate: position,
-  //     area_from: areaPropiedad,
-  //     area_const_from: areaContruidaPropiedad,
-  //     precio_from: precioPropiedad,
-  //     moneda: monedaPreciopropiedad,
-  //     etapa: etapaPropiedad,
-  //     fecha_entrega: fechaentrega,
-  //     fecha_captacion: fechaCaptacion,
-  //     fecha_created: dayjs().format("YYYY-MM-DD HH:mm:ss"),
-  //     financiamiento: financiamiento,
-  //     created_by: session.id,
-  //     status: statusPublicacion,
-  //     name_reference: referencia,
-  //   };
-  //   console.log(newPropiedad);
-  //   console.log(selectedAmenities);
-  //   console.log(coverImage);
-  //   console.log(galleryImages);
-  //   console.log(models);
-  //   const propiedadData = await createPropiedad(newPropiedad);
-  //   console.log(propiedadData);
-  //   if (propiedadData.message === "add") {
-  //     let idPropiedad = propiedadData.id;
-  //     let multimediaPropiedad = [];
-  //     if (coverImage !== null) {
-  //       const coverData = await sendCoverPropiedad(nombrePropiedad);
-  //       let newMultimedia = {
-  //         categoria: "Fotos",
-  //         url_file: coverData.coverImage,
-  //         propiedad_id: idPropiedad,
-  //         etiqueta: "Portada",
-  //       };
-  //       multimediaPropiedad.push(newMultimedia);
-  //     }
-  //     if (galleryImages.length > 0) {
-  //       const galleryData = await sendGalleryPropiedad(nombrePropiedad);
-  //       galleryData.galleryImages.forEach((file) => {
-  //         let newMultimedia = {
-  //           categoria: "Fotos",
-  //           url_file: file,
-  //           propiedad_id: idPropiedad,
-  //           etiqueta: "Galeria",
-  //         };
-  //         multimediaPropiedad.push(newMultimedia);
-  //       });
-  //     }
-  //     if (multimediaPropiedad.length > 0) {
-  //       const multimediaData = await createMultimediaPropiedad(
-  //         multimediaPropiedad
-  //       );
-  //       console.log(multimediaData);
-  //     }
-  //     if (selectedAmenities.length > 0) {
-  //       let newAmenidades = [];
-  //       selectedAmenities.forEach((amenity) => {
-  //         let newAmenidad = {
-  //           propiedad_id: idPropiedad,
-  //           amenidad: amenity,
-  //         };
-  //         newAmenidades.push(newAmenidad);
-  //       });
-  //       const amenidadesData = await createAmenidadesPropiedad(newAmenidades);
-  //       console.log(amenidadesData);
-  //     }
-  //     if (models.length > 0) {
-  //       let newModelos = [];
-  //       let imagesModelos = [];
-  //       models.forEach((model) => {
-  //         let newImage = {
-  //           file: model.imagen,
-  //         };
-  //         imagesModelos.push(newImage);
-  //       });
-  //       const imagesModelosData = await sendImagesModelos(
-  //         nombrePropiedad,
-  //         imagesModelos
-  //       );
 
-  //       models.forEach((modelo, index) => {
-  //         let newModel = {
-  //           propiedad_id: idPropiedad,
-  //           categoria: modelo.categoria,
-  //           nombre: modelo.nombre,
-  //           imagenUrl:
-  //             imagesModelosData.modelosImages[index] === undefined
-  //               ? ""
-  //               : imagesModelosData.modelosImages[index],
-  //           precio: modelo.precio,
-  //           moneda: modelo.moneda,
-  //           area: modelo.area,
-  //           habs: modelo.habs,
-  //           garage: modelo.garage,
-  //           banios: modelo.banios,
-  //           etapa: modelo.etapa,
-  //         };
-  //         newModelos.push(newModel);
-  //       });
-  //       const modelsData = await createModelosPropiedad(newModelos);
-  //       console.log(modelsData);
-  //       let newUnidades = [];
-  //       modelsData.ids.forEach((idModel, index) => {
-  //         models[index].unidades.forEach((unidad) => {
-  //           let newUnidad = {
-  //             modelo_id: idModel,
-  //             nombre: unidad.nombre,
-  //             status: unidad.status,
-  //           };
-  //           newUnidades.push(newUnidad);
-  //         });
-  //       });
-  //       const unidadesData = await createUnidadesModelos(newUnidades);
-  //       console.log(unidadesData);
-  //     }
-  //     setLoadingCreate(false);
-  //     message.success("Se agrego la propiedad");
-  //     navigate("/propiedades");
-  //   } else {
-  //     message.error("Ocurrio un error");
-  //   }
-  // };
   const [addedAmenityIds, setAddedAmenityIds] = useState([]);
   const [removedAmenityIds, setRemovedAmenityIds] = useState([]);
   const compareStates = (state1, state2) => {
     return JSON.stringify(state1) === JSON.stringify(state2);
   };
   const compareStatesAmenidades = (state1, state2) => {
-    console.log(addedAmenityIds);
-    console.log(removedAmenityIds);
     const ids1 = state1.map((item) => item.id).sort();
     const ids2 = state2.map((item) => item.id).sort();
     return JSON.stringify(ids1) === JSON.stringify(ids2);
@@ -770,7 +345,6 @@ const EditPropiedad = () => {
             },
           }
         );
-        console.log(response);
         const data = response.data;
         resolve(data);
       } catch (error) {
@@ -782,7 +356,7 @@ const EditPropiedad = () => {
   const sendDeleteAmenidades = async (newAmenidades) => {
     return new Promise(async (resolve, reject) => {
       const token = session.token;
-      console.log(token);
+
       try {
         const response = await axios.post(
           `${apiUrl}/deleteamenidadespropiedades`,
@@ -794,7 +368,6 @@ const EditPropiedad = () => {
             },
           }
         );
-        console.log(response);
         const data = response.data;
         resolve(data);
       } catch (error) {
@@ -804,8 +377,7 @@ const EditPropiedad = () => {
     });
   };
   const handleSave = async () => {
-    console.log("save");
-    setLoadingCreate(true);
+    // setLoadingCreate(true);
     const arePropiedadesEqual = compareStates(propiedad, initialData);
     if (!arePropiedadesEqual) {
       const sendPropiedad = await sendUpdatePropiedad(propiedad);
@@ -836,23 +408,21 @@ const EditPropiedad = () => {
         message.error("Ocurrio un error, intentelo mas tarde");
         setTimeout(() => {
           setLoadingCreate(false);
-        }, 3000);
+        }, 1000);
         return;
       }
     }
     if (removedAmenityIds.length > 0) {
       const deleteAmenidades = await sendDeleteAmenidades(removedAmenityIds);
       if (deleteAmenidades.message === "delete") {
-        
       } else {
         message.error("Ocurrio un error, intentelo mas tarde");
         setTimeout(() => {
           setLoadingCreate(false);
-        }, 3000);
+        }, 1000);
         return;
       }
     }
-    console.log(newAmenidades);
     let updatedAmenidades = [...initialAmenidades];
 
     // Agregar las nuevas amenidades solo si el array no está vacío
@@ -872,9 +442,9 @@ const EditPropiedad = () => {
     setInitialAmenidades(updatedAmenidades);
     setAmenidades(updatedAmenidades);
     message.success("Se actualizo correctamente la propiedad");
-    setTimeout(() => {
-      setLoadingCreate(false);
-    }, 3000);
+    // setTimeout(() => {
+    //   setLoadingCreate(false);
+    // }, 1000);
   };
   return (
     <>
@@ -994,12 +564,15 @@ const EditPropiedad = () => {
                     onChange={(e) =>
                       handlePropiedad("descripcion", e.target.value)
                     }
-                    maxLength={255}
+                    maxLength={2000}
                     cols={4}
                     rows={4}
                     type="text"
                     className="bg-[#f8f8f8] text-sm border-0 border-none h-full py-4 px-[12px] w-full focus:outline-none"
                   />
+                  <span className="text-xs text-light-font">
+                    Maximo 2000 caracteres
+                  </span>
                 </div>
               </div>
             </div>
@@ -1383,105 +956,6 @@ const EditPropiedad = () => {
               </div>
             </div>
           </div>
-          <div className="boxPropie mb-6">
-            <h1 className="text-md font-medium text-bold-font">Multimedia</h1>
-
-            {/* Cover Image Section */}
-            <div className="mt-[24px] mb-[16px]">
-              <div className="text-sm text-bold-font font-medium">
-                Imagen de portada
-              </div>
-            </div>
-            <div data-position="-1">
-              {coverImage && (
-                <div
-                  className={`propie-upload-thumbnail draggable ${
-                    dropIndex === -1 ? "dropArea" : ""
-                  }`}
-                  style={{ backgroundImage: `url(${coverImage.url})` }}
-                  draggable="true"
-                  onDragStart={() => handleDragStart(-1)}
-                  onDragEnter={() => handleDragEnter(-1)}
-                  onDragLeave={handleDragLeave}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={handleDrop}
-                >
-                  <div className="remove" onClick={handleRemoveCoverImage}>
-                    <FaTimes />
-                  </div>
-                </div>
-              )}
-              <div className="inmocms-upload-gallery">
-                <button
-                  className="bg-white text-sm font-medium border-dark-purple border rounded text-dark-purple px-3 py-2"
-                  onClick={() => document.getElementById("coverInput").click()}
-                >
-                  Subir foto
-                </button>
-                <input
-                  id="coverInput"
-                  className="hidden"
-                  type="file"
-                  accept="image/png, image/jpeg, image/jpg, image/bmp, image/webp, image/gif, image/x-icon"
-                  onChange={handleCoverImageChange}
-                />
-              </div>
-              <div className="text-sm text-light-font mt-[16px] mb-[16px]">
-                (Tamaño máximo <b>50 Mb</b> por archivo)
-              </div>
-            </div>
-
-            {/* Gallery Images Section */}
-            <div className="mt-[24px] mb-[16px]">
-              <div className="text-sm text-bold-font font-medium">
-                Galería de imágenes
-              </div>
-            </div>
-            <div className="propie-upload-gallery">
-              {galleryImages.map((img, index) => (
-                <div
-                  key={index}
-                  data-position={index}
-                  draggable="true"
-                  className={`propie-upload-thumbnail draggable ${
-                    dropIndex === index ? "dropArea" : ""
-                  }`}
-                  style={{ backgroundImage: `url(${img.url})` }}
-                  onDragStart={() => handleDragStart(index)}
-                  onDragEnter={() => handleDragEnter(index)}
-                  onDragLeave={handleDragLeave}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={handleDrop}
-                >
-                  <div
-                    className="remove"
-                    onClick={() => handleRemoveGalleryImage(index)}
-                  >
-                    <FaTimes />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-start">
-              <button
-                className="bg-white text-sm font-medium border-dark-purple border rounded text-dark-purple px-3 py-2"
-                onClick={() => document.getElementById("galleryInput").click()}
-              >
-                Subir fotos
-              </button>
-              <input
-                id="galleryInput"
-                className="hidden"
-                type="file"
-                accept="image/png, image/jpeg, image/jpg, image/bmp, image/webp, image/gif, image/x-icon"
-                multiple
-                onChange={handleGalleryImagesChange}
-              />
-            </div>
-            <div className="text-sm text-light-font mt-[16px] mb-[16px]">
-              (Tamaño máximo <b>50 Mb</b> por archivo)
-            </div>
-          </div>
           <AmenitiesEdit
             propiedad_id={query}
             setAddedAmenityIds={setAddedAmenityIds}
@@ -1490,24 +964,6 @@ const EditPropiedad = () => {
             setSelectedAmenities={setAmenidades}
             initialAmenities={initialAmenidades}
           />
-          <Modelos models={models} setModels={setModels} />
-          {/* <FloatButton.Group
-            trigger="click"
-            type="primary"
-            style={{
-              right: 94, 
-            }} shape="square"
-            icon={<FaSave className="w-full"/>}
-          >
-            <FloatButton className="w-full" />
-            <FloatButton className="w-full"
-              icon={
-                <>
-                  <FaSave />
-                </>
-              }
-            />
-          </FloatButton.Group> */}
           <div className="w-full flex justify-between px-3 bottom-[-31px] py-6 sticky z-50 bg-white shadow-md">
             <span className="text-sm text-bold-font font-mdium">
               * Campos requeridos

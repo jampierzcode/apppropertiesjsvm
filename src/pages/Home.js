@@ -113,6 +113,7 @@ const Home = () => {
           backgroundPosition: "center center",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
+          backgroundColor: `${settings?.color_fondo_portada}`,
         }}
       >
         {settings.is_capa_fondo_portada === "1" ? (

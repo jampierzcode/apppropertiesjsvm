@@ -7,6 +7,8 @@ import { AiOutlineSearch } from "react-icons/ai";
 import axios from "axios";
 import dayjs from "dayjs";
 import { FaBuilding, FaEdit, FaEllipsisV, FaTrash } from "react-icons/fa";
+import { BsViewList } from "react-icons/bs";
+import { FiImage } from "react-icons/fi";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const Propiedades = () => {
@@ -500,7 +502,7 @@ const Propiedades = () => {
                                     to={`/propiedades/editar/${propiedad.id}`}
                                     className="pr-6 rounded flex items-center gap-2 text-sm"
                                   >
-                                    <FaEdit /> Editar
+                                    <FaEdit /> Editar info
                                   </Link>
                                 ),
                                 key: 0,
@@ -517,6 +519,28 @@ const Propiedades = () => {
                                   </div>
                                 ),
                                 key: 1,
+                              },
+                              {
+                                label: (
+                                  <Link
+                                    to={`/property/${propiedad.id}/models`}
+                                    className="pr-6 rounded flex items-center gap-2 text-sm text-red-500 "
+                                  >
+                                    <BsViewList /> Ver Modelos
+                                  </Link>
+                                ),
+                                key: 2,
+                              },
+                              {
+                                label: (
+                                  <Link
+                                    to={`/property/${propiedad.id}/multimedia`}
+                                    className="pr-6 rounded flex items-center gap-2 text-sm text-red-500 "
+                                  >
+                                    <FiImage /> Multimedia
+                                  </Link>
+                                ),
+                                key: 3,
                               },
                             ],
                           }}
