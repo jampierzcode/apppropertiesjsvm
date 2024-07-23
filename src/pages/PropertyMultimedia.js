@@ -1,3 +1,4 @@
+import { message } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaTimes } from "react-icons/fa";
@@ -20,9 +21,9 @@ const PropertyMultimedia = () => {
           `${apiUrl}/multimediabypropiedad/${propertyId}`,
           {}
         );
-        console.log(response.data);
-        setMultimedia(response.data);
-        setInitialMultimedia(response.data);
+        const sortedArray = response.data.sort((a, b) => a.indice - b.indice);
+        setMultimedia(sortedArray);
+        setInitialMultimedia(sortedArray);
       } catch (error) {
         console.error("Error al obtener las amenidades del proyecto:", error);
       }
@@ -59,6 +60,7 @@ const PropertyMultimedia = () => {
       const url = URL.createObjectURL(file);
       const newCoverImage = {
         file,
+        indice: -1,
         url_file: url,
         etiqueta: "Portada",
         categoria: "Fotos",
@@ -88,14 +90,20 @@ const PropertyMultimedia = () => {
   };
   const handleGalleryImagesChange = (e) => {
     const files = Array.from(e.target.files);
-    const newImages = files.map((file) => ({
-      file,
-      url_file: URL.createObjectURL(file),
-      categoria: "Fotos",
-      propiedad_id: propertyId,
-      etiqueta: "Galeria",
-      id: "no",
-    }));
+    const lengtGallery = galleryImages.length - 1;
+    let sumaIndices = lengtGallery;
+    const newImages = files.map((file) => {
+      sumaIndices = sumaIndices + 1;
+      return {
+        file,
+        indice: sumaIndices,
+        url_file: URL.createObjectURL(file),
+        categoria: "Fotos",
+        propiedad_id: propertyId,
+        etiqueta: "Galeria",
+        id: "no",
+      };
+    });
     setGalleryImages((prev) => {
       const updatedGallery = [...prev, ...newImages];
       // Update addNewMultimedia state
@@ -137,7 +145,17 @@ const PropertyMultimedia = () => {
         prev.filter((item) => item.url_file !== imageToRemove.url_file)
       );
     }
-    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+    // Elimina la imagen del array de la galería
+    const updatedGalleryImages = galleryImages.filter((_, i) => i !== index);
+
+    // Actualiza los índices de los objetos restantes
+    const reindexedGalleryImages = updatedGalleryImages.map((img, i) => ({
+      ...img,
+      indice: i,
+    }));
+    setMultimedia([coverImage, ...reindexedGalleryImages]);
+
+    setGalleryImages(reindexedGalleryImages);
   };
 
   const handleDragStart = (index) => {
@@ -152,12 +170,11 @@ const PropertyMultimedia = () => {
   const handleDragLeave = () => {
     setDropIndex(null);
   };
-  const [changedMultimedia, setChangedMultimedia] = useState([]);
 
   const handleDrop = () => {
     if (draggedIndex === null || dropIndex === null) return;
 
-    const newGalleryImages = [...galleryImages]; // Copia del array
+    let newGalleryImages = [...galleryImages]; // Copia del array
 
     let draggedImage;
 
@@ -169,7 +186,9 @@ const PropertyMultimedia = () => {
       } else {
         const droppedImage = { ...newGalleryImages[dropIndex] }; // Copia del objeto
         droppedImage.etiqueta = "Portada";
+        droppedImage.indice = -1;
         draggedImage.etiqueta = "Galeria";
+        draggedImage.indice = dropIndex;
         newGalleryImages[dropIndex] = draggedImage;
         setCoverImage(droppedImage);
 
@@ -177,18 +196,30 @@ const PropertyMultimedia = () => {
       }
     } else {
       draggedImage = { ...newGalleryImages.splice(draggedIndex, 1)[0] }; // Copia del objeto
+      let currentCoverImage = { ...coverImage }; // Copia del objeto
       if (dropIndex === -1) {
         draggedImage.etiqueta = "Portada";
-        const currentCoverImage = { ...coverImage }; // Copia del objeto
+        draggedImage.indice = -1;
         currentCoverImage.etiqueta = "Galeria";
+        currentCoverImage.indice = draggedIndex;
         setCoverImage(draggedImage);
         if (currentCoverImage) {
           newGalleryImages.splice(draggedIndex, 0, currentCoverImage);
         }
+        setMultimedia([draggedImage, ...newGalleryImages]);
       } else {
         newGalleryImages.splice(dropIndex, 0, draggedImage);
+        let ordGallery = [...newGalleryImages];
+        const newData = ordGallery.map((img, index) => {
+          return {
+            ...img,
+            indice: index,
+          };
+        });
+        console.log(newData);
+
+        setMultimedia([currentCoverImage, ...newData]);
       }
-      setMultimedia([draggedImage, ...newGalleryImages]);
     }
 
     setGalleryImages(newGalleryImages);
@@ -197,47 +228,16 @@ const PropertyMultimedia = () => {
   };
   console.log(initialMultimedia);
   console.log(multimedia);
-  //   useEffect(() => {
-  //     if (coverImage !== null && galleryImages.length > 0) {
-  //       setMultimedia([coverImage, ...galleryImages]);
-  //     }
-  //   }, [coverImage, galleryImages]);
 
-  const sendCoverPropiedad = async (nombrePropiedad) => {
+  const sendGalleryPropiedad = async (newGallery) => {
     return new Promise(async (resolve, reject) => {
       const token = session.token;
       const formData = new FormData();
-      const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
-
-      formData.append("propertyName", propertyName);
-      if (coverImage) {
-        formData.append("coverImage", coverImage.file);
-      }
-
-      try {
-        const response = await axios.post(`${apiUrl}/uploadimg`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = response.data;
-        resolve(data);
-      } catch (error) {
-        reject(error);
-        console.error("Upload error:", error);
-      }
-    });
-  };
-  const sendGalleryPropiedad = async (nombrePropiedad) => {
-    return new Promise(async (resolve, reject) => {
-      const token = session.token;
-      const formData = new FormData();
-      const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
+      const propertyName = "gallery"; // Asume que este valor lo obtienes de algún input o estado
 
       formData.append("propertyName", propertyName);
 
-      galleryImages.forEach((img, index) => {
+      newGallery.forEach((img, index) => {
         formData.append(`galleryImages[${index}]`, img.file);
       });
 
@@ -279,6 +279,75 @@ const PropertyMultimedia = () => {
       }
     });
   };
+  const deleteMultimediaPropiedad = async (deleteMultimedia) => {
+    return new Promise(async (resolve, reject) => {
+      const token = session.token;
+
+      try {
+        const response = await axios.post(
+          `${apiUrl}/deletemultimediapropiedades`,
+          deleteMultimedia,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = response.data;
+        resolve(data);
+      } catch (error) {
+        reject(error);
+        console.error("Upload error:", error);
+      }
+    });
+  };
+  const deleteImagenesMultimedia = async (deleteImages) => {
+    return new Promise(async (resolve, reject) => {
+      const token = session.token;
+
+      try {
+        const response = await axios.post(
+          `${apiUrl}/imagenesdelete`,
+          deleteImages,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = response.data;
+        resolve(data);
+      } catch (error) {
+        reject(error);
+        console.error("Upload error:", error);
+      }
+    });
+  };
+  const updateMultimediaPropiedad = async (newMultimedia) => {
+    return new Promise(async (resolve, reject) => {
+      const token = session.token;
+
+      try {
+        const response = await axios.put(
+          `${apiUrl}/multimediapropiedades`,
+          newMultimedia,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = response.data;
+        resolve(data);
+      } catch (error) {
+        reject(error);
+        console.error("Upload error:", error);
+      }
+    });
+  };
   const compareStates = (state1, state2) => {
     return JSON.stringify(state1) === JSON.stringify(state2);
   };
@@ -299,8 +368,63 @@ const PropertyMultimedia = () => {
     setAddNewMultimedia([]);
     setRemoveMultimedia([]);
   };
+  console.log(addNewMultimedia);
+  console.log(removeMultimedia);
   const handleSave = async () => {
     console.log("save");
+    const areMultimediaChange = compareStates(multimedia, initialMultimedia);
+    if (!areMultimediaChange) {
+      console.log(initialMultimedia);
+      const newChangesMultimedia = [];
+      const arrayMultimedia = [...multimedia];
+      const arrayInitial = [...initialMultimedia];
+      arrayInitial.forEach((initM) => {
+        const search = arrayMultimedia.find((m) => m.id === initM.id);
+        console.log(search);
+        if (search.indice !== initM.indice) {
+          newChangesMultimedia.push(search);
+        }
+      });
+      console.log(newChangesMultimedia);
+      if (newChangesMultimedia.length > 0) {
+        const sendUpdate = await updateMultimediaPropiedad(
+          newChangesMultimedia
+        );
+        if (sendUpdate.message === "update") {
+          message.success("Se han actualizado la posicion de algunas imagenes");
+        }
+      }
+    }
+    if (addNewMultimedia.length > 0) {
+      const sendGallery = await sendGalleryPropiedad(addNewMultimedia);
+      const multimediaPropiedad = addNewMultimedia.map((img, index) => {
+        return {
+          ...img,
+          url_file: sendGallery.galleryImages[index],
+        };
+      });
+      console.log(multimediaPropiedad);
+      const multimediaData = await createMultimediaPropiedad(
+        multimediaPropiedad
+      );
+      message.success("Se subieron nuevas imagenes");
+      console.log(multimediaData);
+    }
+    if (removeMultimedia.length > 0) {
+      let sendDeleteImages = {
+        imagenesDelete: [],
+      };
+      removeMultimedia.forEach((img) => {
+        sendDeleteImages.imagenesDelete.push(img.url_file);
+      });
+      console.log(sendDeleteImages);
+      const deleteGallery = await deleteImagenesMultimedia(sendDeleteImages);
+      const deleteMultimedia = await deleteMultimediaPropiedad(
+        removeMultimedia
+      );
+      message.success("Se eliminaron algunas imagenes");
+    }
+    handleCancel();
   };
   return (
     <div className="w-full p-6 app-container-sections">

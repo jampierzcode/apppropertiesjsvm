@@ -18,6 +18,8 @@ import { message } from "antd";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import ListPropiedadesPage from "../components/ListPropiedadesPage";
 import { useSharedData } from "../components/SharedDataContext";
+import { FaPhone, FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
+import { FaPhoneFlip } from "react-icons/fa6";
 
 const ProyectosPage = () => {
   const sharedData = useSharedData();
@@ -130,7 +132,8 @@ const ProyectosPage = () => {
       const response = await axios.get(
         `${apiUrl}/multimediabypropiedad/${query}`
       );
-      setImagesGallery(response.data);
+      const sortedArray = response.data.sort((a, b) => a.indice - b.indice);
+      setImagesGallery(sortedArray);
     } catch (error) {
       console.error("Error fetching gallery data", error);
     }
@@ -219,6 +222,9 @@ const ProyectosPage = () => {
         }
       } else {
         console.log("email");
+
+        let numero = businessData?.phone_contact
+        window.location.href = `tel:${numero}`
       }
     } else {
       message.warning(
@@ -798,16 +804,16 @@ const ProyectosPage = () => {
                       background: settings.color_primary,
                     }}
                     onClick={(e) => handleSendContact(e, "whatsapp")}
-                    className="w-full p-3 rounded-full  text-white text-sm"
+                    className="w-full p-3 rounded-full  text-white text-sm flex items-center justify-center gap-3"
                   >
-                    Contactar por WhatsApp
+                    <FaWhatsapp className="text-xl"/> Contactar por WhatsApp
                   </button>
 
                   <button
-                    onClick={(e) => handleSendContact(e, "email")}
-                    className="w-full p-3 rounded-full bg-gray-200 text-bold-font text-sm mt-4"
+                    onClick={(e) => handleSendContact(e, "telefono")}
+                    className="w-full p-3 rounded-full bg-gray-200 text-bold-font text-sm mt-4 flex items-center justify-center gap-3"
                   >
-                    Contactar
+                    <FaPhoneAlt className="text-xl"/> Llamar {businessData?.phone_contact}
                   </button>
                 </div>
               </div>

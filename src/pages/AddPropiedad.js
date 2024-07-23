@@ -666,17 +666,19 @@ const AddPropiedad = () => {
           url_file: coverData.coverImage,
           propiedad_id: idPropiedad,
           etiqueta: "Portada",
+          indice: -1
         };
         multimediaPropiedad.push(newMultimedia);
       }
       if (galleryImages.length > 0) {
         const galleryData = await sendGalleryPropiedad(nombrePropiedad);
-        galleryData.galleryImages.forEach((file) => {
+        galleryData.galleryImages.forEach((file, index) => {
           let newMultimedia = {
             categoria: "Fotos",
             url_file: file,
             propiedad_id: idPropiedad,
             etiqueta: "Galeria",
+            indice: index
           };
           multimediaPropiedad.push(newMultimedia);
         });
