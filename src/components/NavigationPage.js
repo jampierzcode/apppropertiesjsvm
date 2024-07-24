@@ -73,23 +73,23 @@ const NavigationPage = () => {
     setMobileMenu(!mobileMenu);
   };
   return (
-    <header>
-      <div className="shadow fixed z-40 top-0 left-0 w-full flex items-center justify-between bg-white px-5 py-3 ">
+    <header className="shadow fixed z-40 top-0 left-0 w-full bg-white">
+      <div className="flex items-center justify-between  px-5 py-3 max-w-[1350px] mx-auto">
         <div className="logo w-[25%]">
           <Link to={"/"}>
             <img
-              className="w-[70%] object-contain object-left"
+              className="w-[90%] md:w-[70%] object-contain object-left"
               src={businessData.length !== 0 ? businessData.logo : "no-logo"}
               alt=""
             />
           </Link>
         </div>
-        <div className="links-desktop hidden md:flex">
-          <ul className="flex items-center">
+        <div className="links-desktop hidden md:flex w-[50%]">
+          <ul className="flex items-center justify-center">
             {menu.map((item, index) => {
               return (
                 <Link
-                  className="px-3 py-2 text-bold-font font-medium text-sm"
+                  className="px-3 py-2 text-bold-font font-bold text-lg"
                   key={index}
                   to={item.url}
                 >

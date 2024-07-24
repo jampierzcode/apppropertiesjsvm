@@ -129,7 +129,7 @@ const Home = () => {
               style={{ color: settings.color_primary }}
               className={`text-md md:text-2xl font-bold text-center mb-4`}
             >
-              Busca tus propiedades aqui
+              ¡Busca tus propiedades aqui!
             </h1>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <div>
