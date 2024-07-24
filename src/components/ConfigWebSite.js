@@ -63,7 +63,7 @@ const ConfigWebSite = () => {
           color_primary: web.color_primary || "",
           color_secondary: web.color_secondary || "",
           is_capa_fondo_portada:
-            web.is_capa_fondo_portada === "1" ? true : false,
+            Number(web.is_capa_fondo_portada) === 1 ? true : false,
           color_fondo_portada: web.color_fondo_portada || "",
           color_capa_fondo_portada: web.color_capa_fondo_portada || "",
           portada: web.portada || "",

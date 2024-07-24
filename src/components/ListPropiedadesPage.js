@@ -24,7 +24,7 @@ const ListPropiedadesPage = ({ settings, propiedades }) => {
               </p>
             </div>
             <div className="h-[150px] md:h-[200px]">
-              <img
+              <img title={`${prop.nombre}`} loading="lazy"
                 src={`${prop.url_file}`}
                 className="w-full h-full object-cover object-center"
                 alt=""

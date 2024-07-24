@@ -20,6 +20,7 @@ import ListPropiedadesPage from "../components/ListPropiedadesPage";
 import { useSharedData } from "../components/SharedDataContext";
 import { FaPhone, FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
 import { FaPhoneFlip } from "react-icons/fa6";
+import { Helmet } from "react-helmet-async";
 
 const ProyectosPage = () => {
   const sharedData = useSharedData();
@@ -43,7 +44,7 @@ const ProyectosPage = () => {
   const [imagesGallery, setImagesGallery] = useState([]);
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
   const { query } = useParams();
-  const [propiedad, setPropiedad] = useState([]);
+  const [propiedad, setPropiedad] = useState(null);
   const buscarPropiedades = async () => {
     try {
       const response = await axios.get(`${apiUrl}/propiedades`);
@@ -55,8 +56,7 @@ const ProyectosPage = () => {
   useEffect(() => {
     buscarPropiedades();
   }, [0]);
-  const position =
-    propiedad.length !== 0 ? JSON.parse(propiedad.position_locate) : [0, 0];
+  const position = propiedad ? JSON.parse(propiedad.position_locate) : [0, 0];
 
   useEffect(() => {
     if (mapRef.current) {
@@ -223,8 +223,8 @@ const ProyectosPage = () => {
       } else {
         console.log("email");
 
-        let numero = businessData?.phone_contact
-        window.location.href = `tel:${numero}`
+        let numero = businessData?.phone_contact;
+        window.location.href = `tel:${numero}`;
       }
     } else {
       message.warning(
@@ -243,14 +243,38 @@ const ProyectosPage = () => {
       return { __html: text };
     }
   };
-
+  if (!propiedad) {
+    return (
+      <div className="z-50 top-0 left-0 right-0 fixed bottom-0 w-full h-full bg-dark-purple flex items-center justify-center text-white text-2xl">
+        Cargando...
+      </div>
+    );
+  }
   return (
     <>
+      <Helmet>
+        <title>
+          {propiedad.purpose} de {propiedad.tipo} - Proyecto {propiedad?.nombre}{" "}
+          en {propiedad?.exactAddress}, {propiedad?.distrito_name}{" "}
+          {propiedad?.provincia_name} {propiedad?.region_name}
+        </title>
+        <meta name="description" content={propiedad?.descripcion} />
+        <meta
+          property="og:title"
+          content={`${propiedad.purpose} de ${propiedad.tipo} -  Proyecto ${propiedad?.nombre} en ${propiedad?.exactAddress}, ${propiedad?.distrito_name} ${propiedad?.provincia_name} ${propiedad?.region_name}`}
+        />
+        <meta property="og:description" content={propiedad?.descripcion} />
+        <meta property="og:image" content={`${propiedad.logo}`} />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href={`/proyectos/${propiedad.id}`} />
+        <link rel="icon" href={`${propiedad.logo}`} />
+      </Helmet>
       <div>
         <div className="max-w-[1170px] mx-auto px-3 pt-[120px] py-5">
           <div className="flex flex-wrap justify-between gap-4">
             <div className="flex flex-wrap gap-3">
-              <img className="h-20" src={propiedad.logo} alt="" />
+              <img loading="lazy" className="h-20" src={propiedad.logo} alt="" />
               <div className="">
                 <h1
                   style={{ color: settings.color_primary }}
@@ -428,9 +452,7 @@ const ProyectosPage = () => {
                           className="w-full h-[300px]"
                           id="urlvideoY"
                           src={obtenerCodigoVideo(
-                            propiedad.length === 0
-                              ? ""
-                              : propiedad?.video_descripcion
+                            propiedad ? "" : propiedad?.video_descripcion
                           )}
                           title="YouTube video player"
                           frameBorder="0"
@@ -806,14 +828,15 @@ const ProyectosPage = () => {
                     onClick={(e) => handleSendContact(e, "whatsapp")}
                     className="w-full p-3 rounded-full  text-white text-sm flex items-center justify-center gap-3"
                   >
-                    <FaWhatsapp className="text-xl"/> Contactar por WhatsApp
+                    <FaWhatsapp className="text-xl" /> Contactar por WhatsApp
                   </button>
 
                   <button
                     onClick={(e) => handleSendContact(e, "telefono")}
                     className="w-full p-3 rounded-full bg-gray-200 text-bold-font text-sm mt-4 flex items-center justify-center gap-3"
                   >
-                    <FaPhoneAlt className="text-xl"/> Llamar {businessData?.phone_contact}
+                    <FaPhoneAlt className="text-xl" /> Llamar{" "}
+                    {businessData?.phone_contact}
                   </button>
                 </div>
               </div>

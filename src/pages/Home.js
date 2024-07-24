@@ -116,7 +116,7 @@ const Home = () => {
           backgroundColor: `${settings?.color_fondo_portada}`,
         }}
       >
-        {settings.is_capa_fondo_portada === "1" ? (
+        {Number(settings.is_capa_fondo_portada) === 1 ? (
           <div
             style={{ background: settings.color_capa_fondo_portada }}
             className="absolute top-0 left-0 w-full h-full bottom-0 right-0"

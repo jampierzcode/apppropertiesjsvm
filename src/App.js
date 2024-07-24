@@ -15,7 +15,6 @@ import LayoutPages from "./components/LayoutPages";
 import Clientes from "./pages/Clientes";
 import ProyectosPage from "./pages/ProyectosPage";
 import EditPropiedad from "./pages/EditPropiedad";
-import Modelos from "./components/Modelos";
 import PropertyModelos from "./pages/PropertyModelos";
 import PropertyMultimedia from "./pages/PropertyMultimedia";
 
