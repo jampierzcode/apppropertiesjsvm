@@ -5,16 +5,17 @@ const LogoUpload = ({ logo, setLogo, setLogoFile }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     const url = URL.createObjectURL(file);
-    console.log(url)
+    console.log(url);
+    console.log(file);
     setLogo(url);
     setLogoFile(file);
   };
-  
+
   const handleDelete = () => {
     setLogo("");
     setLogoFile("");
-    let file = document.getElementById("perfil_upload")
-    file.value = ""
+    let file = document.getElementById("perfil_upload");
+    file.value = "";
   };
 
   return (

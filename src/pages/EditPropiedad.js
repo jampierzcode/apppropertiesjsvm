@@ -9,6 +9,7 @@ import { FaCalendar, FaTimes } from "react-icons/fa";
 import { BsBoundingBoxCircles } from "react-icons/bs";
 import { useParams } from "react-router-dom";
 import AmenitiesEdit from "../components/AmenitiesEdit";
+import LogoUpload from "../components/LogoUpload";
 
 const EditPropiedad = () => {
   //useparams
@@ -21,6 +22,8 @@ const EditPropiedad = () => {
   const [loadingCreate, setLoadingCreate] = useState(false);
   // ESTADOS DE DATOS BASICOS propiedad
   const [propiedad, setPropiedad] = useState(null);
+
+  const [logoFilePropiedad, setLogoFilePropiedad] = useState("");
   const [initialData, setInitialData] = useState(null);
   // ESTADOS DE DATOS BASICOS propiedad amenidades
   const [amenidades, setAmenidades] = useState([]);
@@ -330,29 +333,6 @@ const EditPropiedad = () => {
     setPropiedad(initialData);
     setAmenidades(initialAmenidades);
   };
-  const sendUpdatePropiedad = async (newPropiedad) => {
-    return new Promise(async (resolve, reject) => {
-      const token = session.token;
-
-      try {
-        const response = await axios.put(
-          `${apiUrl}/propiedades/${query}`,
-          newPropiedad,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = response.data;
-        resolve(data);
-      } catch (error) {
-        reject(error);
-        console.error("Upload error:", error);
-      }
-    });
-  };
   const sendDeleteAmenidades = async (newAmenidades) => {
     return new Promise(async (resolve, reject) => {
       const token = session.token;
@@ -378,15 +358,102 @@ const EditPropiedad = () => {
   };
   const handleSave = async () => {
     // setLoadingCreate(true);
-    const arePropiedadesEqual = compareStates(propiedad, initialData);
-    if (!arePropiedadesEqual) {
-      const sendPropiedad = await sendUpdatePropiedad(propiedad);
-      if (sendPropiedad.message === "update") {
-        setInitialData(propiedad);
+    const token = session.token;
+    const uploadImageUrl = `${apiUrl}/businessimg`;
+
+    const { logo, ...propiedadInfo } = propiedad;
+
+    const uploadLogo = async (changeFile) => {
+      console.log(changeFile);
+      const formData = new FormData();
+      formData.append("imageBusiness", changeFile);
+      formData.append("propertyName", "logosproyectos");
+      const response = await axios.post(uploadImageUrl, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data.url;
+    };
+    const deleteLogo = async (image_url) => {
+      console.log(image_url);
+      const response = await axios.delete(uploadImageUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          image_url: image_url,
+        },
+      });
+      console.log(response);
+      return response.data;
+    };
+
+    const updateInfoPropiedad = async (updatePropiedad) => {
+      const response = await axios.put(
+        `${apiUrl}/propiedades/${query}`,
+        updatePropiedad,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    };
+    // Existing business data
+    if (initialData.logo && !logo) {
+      console.log("entro a eliminar");
+      // Logo deleted
+      const delete_logo = await deleteLogo(initialData.logo);
+      if (delete_logo.message === "remove") {
+        const response = await updateInfoPropiedad(propiedad);
+        console.log(response);
+        if (response.message === "update") {
+          message.success("Se actualizo correctamente la propiedad");
+          setInitialData(propiedad);
+          setLogoFilePropiedad("");
+        } else {
+          message.error("No se actualizo correctamente la propiedad");
+        }
       } else {
-        message.error("Ocurrio un error, intentelo mas tarde");
+        message.error("No se elimino la imagen correctamente");
+      }
+    } else if (logo && logo !== initialData.logo) {
+      // Logo changed
+      if (initialData.logo !== "" && initialData.logo !== null) {
+        const delete_logo = await deleteLogo(initialData.logo);
+      }
+      const imageUrl = await uploadLogo(logoFilePropiedad);
+      const response = await updateInfoPropiedad({
+        ...propiedadInfo,
+        logo: imageUrl,
+      });
+      console.log(response);
+      if (response.message === "update") {
+        message.success("Se actualizo correctamente el modelo");
+        setInitialData(propiedad);
+        setLogoFilePropiedad("");
+        // fetchModelosProperty();
+      } else {
+        message.error("No se actualizo correctamente el modelo");
+      }
+    } else {
+      // No changes in logo
+      const response = await updateInfoPropiedad(propiedad);
+      console.log(response);
+      if (response.message === "update") {
+        message.success("Se actualizo correctamente el modelo");
+        setInitialData(propiedad);
+        setLogoFilePropiedad("");
+        // fetchModelosProperty();
+      } else {
+        message.error("No se actualizo correctamente el modelo");
       }
     }
+
     let newAmenidades = [];
     if (addedAmenityIds.length > 0) {
       addedAmenityIds.forEach((amenity) => {
@@ -503,6 +570,21 @@ const EditPropiedad = () => {
             </div>
           </div>
           <div className="boxPropie mb-6">
+            <h1 className="text-lg font-medium text-bold-font mb-[16px]">
+              Logo
+            </h1>
+            <div className="w-full flex items-center gap-3">
+              <LogoUpload
+                setLogoFile={setLogoFilePropiedad}
+                logo={propiedad.logo}
+                setLogo={(logo) =>
+                  setPropiedad((prevState) => ({
+                    ...prevState,
+                    logo,
+                  }))
+                }
+              />
+            </div>
             <h1 className="text-lg font-medium text-bold-font mb-[16px]">
               Datos básicos
             </h1>

@@ -1067,7 +1067,10 @@ const PropertyModelos = () => {
                     <td>{modelo.banios}</td>
 
                     <td>{modelo.etapa}</td>
-                    <td>{modelo.cantidad_unidades_totales} unidades <br /> {modelo.cantidad_unidades_disponibles} disponibles</td>
+                    <td>
+                      {modelo.cantidad_unidades_totales} unidades <br />{" "}
+                      {modelo.cantidad_unidades_disponibles} disponibles
+                    </td>
 
                     <td className="ajustes-tabla-celda">
                       <div className="ajustes-tabla-celda-item px-4">
