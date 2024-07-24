@@ -243,625 +243,659 @@ const ProyectosPage = () => {
       return { __html: text };
     }
   };
-  if (!propiedad) {
-    return (
-      <div className="z-50 top-0 left-0 right-0 fixed bottom-0 w-full h-full bg-dark-purple flex items-center justify-center text-white text-2xl">
-        Cargando...
-      </div>
-    );
-  }
   return (
     <>
-      <Helmet>
-        <title>
-          {propiedad.purpose} de {propiedad.tipo} - Proyecto {propiedad?.nombre}{" "}
-          en {propiedad?.exactAddress}, {propiedad?.distrito_name}{" "}
-          {propiedad?.provincia_name} {propiedad?.region_name}
-        </title>
-        <meta name="description" content={propiedad?.descripcion} />
-        <meta
-          property="og:title"
-          content={`${propiedad.purpose} de ${propiedad.tipo} -  Proyecto ${propiedad?.nombre} en ${propiedad?.exactAddress}, ${propiedad?.distrito_name} ${propiedad?.provincia_name} ${propiedad?.region_name}`}
-        />
-        <meta property="og:description" content={propiedad?.descripcion} />
-        <meta property="og:image" content={`${propiedad.logo}`} />
-        <meta property="og:url" content={window.location.href} />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href={`/proyectos/${propiedad.id}`} />
-        <link rel="icon" href={`${propiedad.logo}`} />
-      </Helmet>
-      <div>
-        <div className="max-w-[1170px] mx-auto px-3 pt-[120px] py-5">
-          <div className="flex flex-wrap justify-between gap-4">
-            <div className="flex flex-wrap gap-3">
-              <img loading="lazy" className="h-20" src={propiedad.logo} alt="" />
-              <div className="">
-                <h1
-                  style={{ color: settings.color_primary }}
-                  className="font-bold text-lg"
-                >
-                  {propiedad.nombre}
-                </h1>
-                <p className="font-medium text-xs text-bold-font">
-                  {propiedad.exactAddress}, {propiedad.distrito_name}
-                </p>
-                <p className="font-medium text-xs text-bold-font">
-                  {propiedad.distrito_name}-{propiedad.provincia_name}
-                </p>
-              </div>
-            </div>
-            <div className="flex">
-              <div className="w">
-                <h1 className="text-bold-font font-medium text-sm"></h1> Precio
-                desde{" "}
-                <span
-                  style={{ color: settings.color }}
-                  className=" text-sm font-bold"
-                >
-                  {propiedad.moneda === "DOLLAR" ? propiedad.precio_from : null}{" "}
-                  {propiedad.moneda === "DOLLAR" ? "$" : "S/"}{" "}
-                  {propiedad.moneda === "PEN" ? propiedad.precio_from : null}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="w-full flex flex-col gap-6 md:col-span-8">
-              <div className="image-slider-container w-full">
-                {imagesGallery.length > 0 ? (
-                  <>
-                    <div className="h-[250px] md:h-[450px]">
-                      <Swiper
-                        style={{
-                          "--swiper-navigation-color": "#fff",
-                          "--swiper-pagination-color": "#fff",
-                          width: "100%",
-                          height: "100%",
-                        }}
-                        spaceBetween={10}
-                        navigation={true}
-                        thumbs={{ swiper: thumbsSwiper }}
-                        modules={[FreeMode, Navigation, Thumbs]}
-                        className="mySwiper2"
-                      >
-                        {imagesGallery.map((image, index) => (
-                          <SwiperSlide key={index}>
-                            <img
-                              src={image.url_file}
-                              alt={`Imagen ${index + 1}`}
-                            />
-                          </SwiperSlide>
-                        ))}
-                      </Swiper>
-                    </div>
-                    <Swiper
-                      style={{
-                        height: "100px",
-                        width: "100%",
-                      }}
-                      onSwiper={setThumbsSwiper}
-                      spaceBetween={10}
-                      breakpoints={{
-                        640: {
-                          slidesPerView: 3,
-                        },
-                        768: {
-                          slidesPerView: 4,
-                        },
-                        1024: {
-                          slidesPerView: 4,
-                        },
-                      }}
-                      slidesPerView={2}
-                      freeMode={true}
-                      watchSlidesProgress={true}
-                      modules={[FreeMode, Navigation, Thumbs]}
-                      className="mySwiper my-5"
+      {propiedad !== null ? (
+        <>
+          {" "}
+          <Helmet>
+            <title>
+              {propiedad.purpose} de {propiedad.tipo} - Proyecto{" "}
+              {propiedad?.nombre} en {propiedad?.exactAddress},{" "}
+              {propiedad?.distrito_name} {propiedad?.provincia_name}{" "}
+              {propiedad?.region_name}
+            </title>
+            <meta name="description" content={propiedad?.descripcion} />
+            <meta
+              property="og:title"
+              content={`${propiedad.purpose} de ${propiedad.tipo} -  Proyecto ${propiedad?.nombre} en ${propiedad?.exactAddress}, ${propiedad?.distrito_name} ${propiedad?.provincia_name} ${propiedad?.region_name}`}
+            />
+            <meta property="og:description" content={propiedad?.descripcion} />
+            <meta property="og:image" content={`${propiedad.logo}`} />
+            <meta property="og:url" content={window.location.href} />
+            <meta property="og:type" content="website" />
+            <link rel="canonical" href={`/proyectos/${propiedad.id}`} />
+            <link rel="icon" href={`${propiedad.logo}`} />
+          </Helmet>
+          <div>
+            <div className="max-w-[1170px] mx-auto px-3 pt-[120px] py-5">
+              <div className="flex flex-wrap justify-between gap-4">
+                <div className="flex flex-wrap gap-3">
+                  <img
+                    loading="lazy"
+                    className="h-20"
+                    src={propiedad.logo}
+                    alt=""
+                  />
+                  <div className="">
+                    <h1
+                      style={{ color: settings.color_primary }}
+                      className="font-bold text-lg"
                     >
-                      {imagesGallery.map((image, index) => (
-                        <SwiperSlide key={index}>
-                          <img
-                            style={{ borderColor: settings.color_primary }}
-                            className={`border-2`}
-                            src={image.url_file}
-                            alt={`Thumbnail ${index + 1}`}
-                          />
-                        </SwiperSlide>
-                      ))}
-                    </Swiper>
-                  </>
+                      {propiedad.nombre}
+                    </h1>
+                    <p className="font-medium text-xs text-bold-font">
+                      {propiedad.exactAddress}, {propiedad.distrito_name}
+                    </p>
+                    <p className="font-medium text-xs text-bold-font">
+                      {propiedad.distrito_name}-{propiedad.provincia_name}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex">
+                  <div className="w">
+                    <h1 className="text-bold-font font-medium text-sm"></h1>{" "}
+                    Precio desde{" "}
+                    <span
+                      style={{ color: settings.color }}
+                      className=" text-sm font-bold"
+                    >
+                      {propiedad.moneda === "DOLLAR"
+                        ? propiedad.precio_from
+                        : null}{" "}
+                      {propiedad.moneda === "DOLLAR" ? "$" : "S/"}{" "}
+                      {propiedad.moneda === "PEN"
+                        ? propiedad.precio_from
+                        : null}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div className="w-full flex flex-col gap-6 md:col-span-8">
+                  <div className="image-slider-container w-full">
+                    {imagesGallery.length > 0 ? (
+                      <>
+                        <div className="h-[250px] md:h-[450px]">
+                          <Swiper
+                            style={{
+                              "--swiper-navigation-color": "#fff",
+                              "--swiper-pagination-color": "#fff",
+                              width: "100%",
+                              height: "100%",
+                            }}
+                            spaceBetween={10}
+                            navigation={true}
+                            thumbs={{ swiper: thumbsSwiper }}
+                            modules={[FreeMode, Navigation, Thumbs]}
+                            className="mySwiper2"
+                          >
+                            {imagesGallery.map((image, index) => (
+                              <SwiperSlide key={index}>
+                                <img
+                                  src={image.url_file}
+                                  alt={`Imagen ${index + 1}`}
+                                />
+                              </SwiperSlide>
+                            ))}
+                          </Swiper>
+                        </div>
+                        <Swiper
+                          style={{
+                            height: "100px",
+                            width: "100%",
+                          }}
+                          onSwiper={setThumbsSwiper}
+                          spaceBetween={10}
+                          breakpoints={{
+                            640: {
+                              slidesPerView: 3,
+                            },
+                            768: {
+                              slidesPerView: 4,
+                            },
+                            1024: {
+                              slidesPerView: 4,
+                            },
+                          }}
+                          slidesPerView={2}
+                          freeMode={true}
+                          watchSlidesProgress={true}
+                          modules={[FreeMode, Navigation, Thumbs]}
+                          className="mySwiper my-5"
+                        >
+                          {imagesGallery.map((image, index) => (
+                            <SwiperSlide key={index}>
+                              <img
+                                style={{ borderColor: settings.color_primary }}
+                                className={`border-2`}
+                                src={image.url_file}
+                                alt={`Thumbnail ${index + 1}`}
+                              />
+                            </SwiperSlide>
+                          ))}
+                        </Swiper>
+                      </>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      style={{ color: settings.color_primary }}
+                      className="underline underline-offset-3 font-bold"
+                      to={"/"}
+                    >
+                      Home
+                    </Link>
+                    {">"}
+                    <Link
+                      style={{ color: settings.color_primary }}
+                      className="underline underline-offset-3 font-bold "
+                      to={`/busqueda/${String(
+                        propiedad.purpose
+                      ).toLowerCase()}-de-${String(
+                        propiedad.tipo
+                      ).toLowerCase()}`}
+                    >
+                      {String(propiedad.purpose).toLowerCase()} de{" "}
+                      {String(propiedad.tipo).toLowerCase()}
+                    </Link>
+                    {">"}
+                    <Link
+                      style={{ color: settings.color_primary }}
+                      className="underline underline-offset-3 font-bold"
+                      to={`/busqueda/${String(
+                        propiedad.purpose
+                      ).toLowerCase()}-de-${String(
+                        propiedad.tipo
+                      ).toLowerCase()}-en-${propiedad.region_name}-${
+                        propiedad.region
+                      }`}
+                    >
+                      {propiedad.region_name}
+                    </Link>
+                    {">"}
+                    <Link
+                      style={{ color: settings.color_primary }}
+                      className="underline underline-offset-3 font-bold "
+                      to={`/busqueda/${String(
+                        propiedad.purpose
+                      ).toLowerCase()}-de-${String(
+                        propiedad.tipo
+                      ).toLowerCase()}-en-${propiedad.region_name}-${
+                        propiedad.provincia_name
+                      }-${propiedad.provincia}`}
+                    >
+                      {propiedad.provincia_name}
+                    </Link>
+                    {">"}
+                    <Link
+                      style={{ color: settings.color_primary }}
+                      className="underline underline-offset-3 font-bold "
+                      to={`/busqueda/${String(
+                        propiedad.purpose
+                      ).toLowerCase()}-de-${String(
+                        propiedad.tipo
+                      ).toLowerCase()}-en-${propiedad.region_name}-${
+                        propiedad.provincia_name
+                      }-${propiedad.distrito_name}-${propiedad.distrito}`}
+                    >
+                      {propiedad.distrito_name}
+                    </Link>
+                  </div>
+                  <div className="boxContain">
+                    <div className="w-full">
+                      <h1
+                        style={{
+                          color: settings.color_primary,
+                          borderColor: settings.color_primary,
+                        }}
+                        className=" font-bold text-lg pb-1 border-b-2  w-full"
+                      >
+                        Descripcion de la propiedad
+                      </h1>
+                      <div className="grid grid-cols-1 gap-4 mt-4">
+                        {propiedad.video_descripcion !== "" ? (
+                          <div>
+                            <iframe
+                              className="w-full h-[300px]"
+                              id="urlvideoY"
+                              src={obtenerCodigoVideo(
+                                propiedad ? "" : propiedad?.video_descripcion
+                              )}
+                              title="YouTube video player"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                            />
+                          </div>
+                        ) : null}
+
+                        <p
+                          className="text-sm text-light-font py-4"
+                          dangerouslySetInnerHTML={createMarkup(
+                            propiedad?.descripcion
+                          )}
+                        ></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="boxContain">
+                      <div className="w-full">
+                        <h1
+                          style={{
+                            color: settings.color_primary,
+                            borderColor: settings.color_primary,
+                          }}
+                          className=" font-bold text-lg pb-1 border-b-2  w-full"
+                        >
+                          Información del proyecto
+                        </h1>
+                        <div
+                          style={{ borderColor: settings.color_primary }}
+                          className="w-full p-2 border-2 mt-4"
+                        >
+                          <table>
+                            <tbody className="text-xs">
+                              <tr>
+                                <td
+                                  className="px-[14px]"
+                                  style={{ width: "175px" }}
+                                >
+                                  <strong>Tipo de inmueble</strong>
+                                </td>
+                                <td className="px-[14px]">{propiedad.tipo}</td>
+                              </tr>
+
+                              <tr>
+                                <td
+                                  className="px-[14px]"
+                                  style={{ width: "175px" }}
+                                >
+                                  <strong>Área total</strong>
+                                </td>
+                                <td className="px-[14px]">
+                                  {propiedad.area_from} m2
+                                </td>
+                              </tr>
+                              <tr>
+                                <td
+                                  className="px-[14px]"
+                                  style={{ width: "175px" }}
+                                >
+                                  <strong>Dormitorios</strong>
+                                </td>
+                                <td className="px-[14px]">{propiedad.habs}</td>
+                              </tr>
+                              <tr>
+                                <td
+                                  className="px-[14px]"
+                                  style={{ width: "175px" }}
+                                >
+                                  <strong>Etapa del proyecto</strong>
+                                </td>
+                                <td className="px-[14px]">{propiedad.etapa}</td>
+                              </tr>
+                              <tr>
+                                <td
+                                  className="px-[14px]"
+                                  style={{ width: "175px" }}
+                                >
+                                  <strong>Fecha de entrega</strong>
+                                </td>
+                                <td className="px-[14px]">
+                                  {dayjs(propiedad.fecha_entrega).format(
+                                    "DD [de] MMMM, YYYY"
+                                  )}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td
+                                  className="px-[14px]"
+                                  style={{ width: "175px" }}
+                                >
+                                  <strong>Financiamiento</strong>
+                                </td>
+                                <td className="px-[14px]">
+                                  {propiedad.financiamiento === 1 ? "SI" : "NO"}
+                                </td>
+                              </tr>
+                              <tr className="Project-inmobiliaria">
+                                <td
+                                  style={{
+                                    width: "175PX",
+                                    textAlign: "center",
+                                  }}
+                                >
+                                  <figure className="Project-inmobiliaria__logo">
+                                    <a className="h-12" href="/">
+                                      <img
+                                        className="h-full"
+                                        alt="logo inmobiliario"
+                                        src={businessData?.logo}
+                                      />
+                                    </a>
+                                  </figure>
+                                </td>
+                                <td className="px-[14px]">
+                                  <div className="Project-inmobiliaria__name">
+                                    <h2>{businessData?.nombre_razon}</h2>
+                                    <div className="bx-link-go">
+                                      <Link
+                                        className="text-sm font-bold flex gap-2"
+                                        to={
+                                          "/busqueda/venta-de-departemento-o-casa-o-oficina-o-lote"
+                                        }
+                                      >
+                                        Ver otros proyectos&gt;
+                                      </Link>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="boxContain">
+                      <div className="w-full">
+                        <h1
+                          style={{
+                            color: settings.color_primary,
+                            borderColor: settings.color_primary,
+                          }}
+                          className=" font-bold text-lg pb-1 border-b-2  w-full"
+                        >
+                          Áreas comunes
+                        </h1>
+                        <ul className="text-sm text-light-font grid grid-cols-2 gap-2 mt-4">
+                          {amenidades.map((amenidad, index) => {
+                            return <li key={index}>{amenidad.amenidad}</li>;
+                          })}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  {modelos.length > 0 ? (
+                    <div className="boxContain">
+                      <div className="w-full">
+                        <h1
+                          style={{
+                            color: settings.color_primary,
+                            borderColor: settings.color_primary,
+                          }}
+                          className=" font-bold text-lg pb-1 border-b-2  w-full"
+                        >
+                          Modelos de {propiedad.tipo}
+                        </h1>
+                        <div className="w-full">
+                          <div className="max-h-[620px] overflow-y-auto divide-y-2 flex flex-col gap-4">
+                            {modelos
+                              .filter(
+                                (model) =>
+                                  model.cantidad_unidades_disponibles > 0
+                              )
+                              .map((model, index) => (
+                                <div
+                                  key={index}
+                                  className="w-full py-4 grid grid-cols-6 gap-3"
+                                >
+                                  <div className="w-full">
+                                    <img
+                                      className="w-full"
+                                      src={model.imagenUrl}
+                                      alt=""
+                                    />
+                                  </div>
+                                  <div className="col-span-4 w-full">
+                                    <div className="w-full top-info overflow-x-auto flex flex-wrap mb-4">
+                                      <span className="px-4 text-sm md:w-[34%]">
+                                        Modelo
+                                      </span>
+                                      {model.habs === 0 ? null : (
+                                        <span className="px-4 text-sm md:w-[14%]">
+                                          Dorm.
+                                        </span>
+                                      )}
+                                      {model.banios === 0 ? null : (
+                                        <span className="px-4 text-sm md:w-[14%]">
+                                          Baños
+                                        </span>
+                                      )}
+                                      {Number(model.garage) === 0 ? null : (
+                                        <span className="px-4 text-sm md:w-[14%]">
+                                          Garage
+                                        </span>
+                                      )}
+                                      <span className="px-4 text-sm md:w-[19%]">
+                                        Area
+                                      </span>
+                                      <span className="px-4 text-sm md:w-[28%]">
+                                        Precio desde
+                                      </span>
+                                    </div>
+                                    <div className="w-full bottom-info overflow-x-auto flex flex-wrap">
+                                      <span className="px-4 text-sm font-bold md:w-[34%]">
+                                        {model.nombre}
+                                      </span>
+                                      {model.habs === 0 ? null : (
+                                        <span className="px-4 text-sm font-bold md:w-[14%]">
+                                          {model.habs}
+                                        </span>
+                                      )}
+                                      {model.banios === 0 ? null : (
+                                        <span className="px-4 text-sm font-bold md:w-[14%]">
+                                          {model.banios}
+                                        </span>
+                                      )}
+                                      {Number(model.garage) === 0 ? null : (
+                                        <span className="px-4 text-sm font-bold md:w-[14%]">
+                                          {Number(model.garage) === 1
+                                            ? "SI"
+                                            : "NO"}
+                                        </span>
+                                      )}
+                                      <span className="px-4 text-sm font-bold md:w-[19%]">
+                                        {model.area} m2
+                                      </span>
+                                      <span className="px-4 text-sm font-bold md:w-[28%]">
+                                        {model.moneda === "DOLLAR"
+                                          ? model.precio
+                                          : null}{" "}
+                                        {model.moneda === "DOLLAR" ? "$" : "S/"}{" "}
+                                        {model.moneda === "PEN"
+                                          ? model.precio
+                                          : null}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="w-full">
+                                    <button
+                                      style={{
+                                        background: settings.color_primary,
+                                      }}
+                                      className="rounded font-bold text-white p-2 text-sm"
+                                    >
+                                      Cotizar{" "}
+                                      {model.cantidad_unidades_disponibles}{" "}
+                                      unidades
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="boxContain">
+                    <div className="w-full">
+                      <h1
+                        style={{
+                          color: settings.color_primary,
+                          borderColor: settings.color_primary,
+                        }}
+                        className=" text-center font-bold text-lg pb-1 border-b-2  w-full"
+                      >
+                        Plano de ubicación
+                      </h1>
+                      <div className="w-full mt-4 relative z-10">
+                        <MapContainer
+                          center={position}
+                          zoom={17}
+                          className={`h-[200px] md:h-[450px] w-full`}
+                          ref={mapRef}
+                        >
+                          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+                          <Marker position={position}>
+                            <Popup>Propiedades: 1</Popup>
+                          </Marker>
+                        </MapContainer>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="sticky top-[80px] w-full md:col-span-4 p-4 rounded border border-gray-600 h-max">
+                  <h1 className="mb-4 text-lg font-bold text-bold-font">
+                    Contáctate con {businessData?.nombre_razon}, por la
+                    propiedad {propiedad.nombre}
+                  </h1>
+                  <div
+                    className="form  w-full grid grid-cols-1
+              gap-2"
+                  >
+                    <div className="group">
+                      <label
+                        className="text-sm font-medium text-bold-font"
+                        htmlFor=""
+                      >
+                        Correo electronico
+                      </label>
+                      <input
+                        value={dataCliente.email}
+                        onChange={(e) => handleCliente(e.target.value, "email")}
+                        type="email"
+                        className="w-full p-3 rounded bg-gray-200 text-sm"
+                      />
+                    </div>
+                    <div className="group">
+                      <label
+                        className="text-sm font-medium text-bold-font"
+                        htmlFor=""
+                      >
+                        Ingresa tus nombres
+                      </label>
+                      <input
+                        value={dataCliente.nombres}
+                        onChange={(e) =>
+                          handleCliente(e.target.value, "nombres")
+                        }
+                        type="text"
+                        className="w-full p-3 rounded bg-gray-200 text-sm"
+                      />
+                    </div>
+                    <div className="group">
+                      <label
+                        className="text-sm font-medium text-bold-font"
+                        htmlFor=""
+                      >
+                        Ingresa tus apellidos
+                      </label>
+                      <input
+                        value={dataCliente.apellidos}
+                        onChange={(e) =>
+                          handleCliente(e.target.value, "apellidos")
+                        }
+                        type="text"
+                        className="w-full p-3 rounded bg-gray-200 text-sm"
+                      />
+                    </div>
+                    <div className="group">
+                      <label
+                        className="text-sm font-medium text-bold-font"
+                        htmlFor=""
+                      >
+                        Celular
+                      </label>
+                      <input
+                        value={dataCliente.celular}
+                        onChange={(e) =>
+                          handleCliente(e.target.value, "celular")
+                        }
+                        type="text"
+                        className="w-full p-3 rounded bg-gray-200 text-sm"
+                      />
+                    </div>
+                    <div className="group">
+                      <label
+                        className="text-sm font-medium text-bold-font"
+                        htmlFor=""
+                      >
+                        Mensaje
+                      </label>
+                      <textarea
+                        value={dataCliente.mensaje}
+                        onChange={(e) =>
+                          handleCliente(e.target.value, "mensaje")
+                        }
+                        className="w-full p-3 rounded bg-gray-200 text-sm"
+                      />
+                    </div>
+                    <div className="buttton">
+                      <p className="text-sm text-light-font">
+                        Enviar mensaje por:
+                      </p>
+                      <button
+                        style={{
+                          background: settings.color_primary,
+                        }}
+                        onClick={(e) => handleSendContact(e, "whatsapp")}
+                        className="w-full p-3 rounded-full  text-white text-sm flex items-center justify-center gap-3"
+                      >
+                        <FaWhatsapp className="text-xl" /> Contactar por
+                        WhatsApp
+                      </button>
+
+                      <button
+                        onClick={(e) => handleSendContact(e, "telefono")}
+                        className="w-full p-3 rounded-full bg-gray-200 text-bold-font text-sm mt-4 flex items-center justify-center gap-3"
+                      >
+                        <FaPhoneAlt className="text-xl" /> Llamar{" "}
+                        {businessData?.phone_contact}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-[#f3f4f6] py-[40px] w-full">
+              <div className="max-w-[1170px] mx-auto">
+                <h1
+                  style={{
+                    color: settings.color_primary,
+                  }}
+                  className="text-2xl font-bold mb-4"
+                >
+                  Otros proyectos que podrian interesarte
+                </h1>
+                {properties.length > 0 ? (
+                  <ListPropiedadesPage
+                    settings={settings}
+                    propiedades={properties}
+                  />
                 ) : null}
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  style={{ color: settings.color_primary }}
-                  className="underline underline-offset-3 font-bold"
-                  to={"/"}
-                >
-                  Home
-                </Link>
-                {">"}
-                <Link
-                  style={{ color: settings.color_primary }}
-                  className="underline underline-offset-3 font-bold "
-                  to={`/busqueda/${String(
-                    propiedad.purpose
-                  ).toLowerCase()}-de-${String(propiedad.tipo).toLowerCase()}`}
-                >
-                  {String(propiedad.purpose).toLowerCase()} de{" "}
-                  {String(propiedad.tipo).toLowerCase()}
-                </Link>
-                {">"}
-                <Link
-                  style={{ color: settings.color_primary }}
-                  className="underline underline-offset-3 font-bold"
-                  to={`/busqueda/${String(
-                    propiedad.purpose
-                  ).toLowerCase()}-de-${String(
-                    propiedad.tipo
-                  ).toLowerCase()}-en-${propiedad.region_name}-${
-                    propiedad.region
-                  }`}
-                >
-                  {propiedad.region_name}
-                </Link>
-                {">"}
-                <Link
-                  style={{ color: settings.color_primary }}
-                  className="underline underline-offset-3 font-bold "
-                  to={`/busqueda/${String(
-                    propiedad.purpose
-                  ).toLowerCase()}-de-${String(
-                    propiedad.tipo
-                  ).toLowerCase()}-en-${propiedad.region_name}-${
-                    propiedad.provincia_name
-                  }-${propiedad.provincia}`}
-                >
-                  {propiedad.provincia_name}
-                </Link>
-                {">"}
-                <Link
-                  style={{ color: settings.color_primary }}
-                  className="underline underline-offset-3 font-bold "
-                  to={`/busqueda/${String(
-                    propiedad.purpose
-                  ).toLowerCase()}-de-${String(
-                    propiedad.tipo
-                  ).toLowerCase()}-en-${propiedad.region_name}-${
-                    propiedad.provincia_name
-                  }-${propiedad.distrito_name}-${propiedad.distrito}`}
-                >
-                  {propiedad.distrito_name}
-                </Link>
-              </div>
-              <div className="boxContain">
-                <div className="w-full">
-                  <h1
-                    style={{
-                      color: settings.color_primary,
-                      borderColor: settings.color_primary,
-                    }}
-                    className=" font-bold text-lg pb-1 border-b-2  w-full"
-                  >
-                    Descripcion de la propiedad
-                  </h1>
-                  <div className="grid grid-cols-1 gap-4 mt-4">
-                    {propiedad.video_descripcion !== "" ? (
-                      <div>
-                        <iframe
-                          className="w-full h-[300px]"
-                          id="urlvideoY"
-                          src={obtenerCodigoVideo(
-                            propiedad ? "" : propiedad?.video_descripcion
-                          )}
-                          title="YouTube video player"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                          allowFullScreen
-                        />
-                      </div>
-                    ) : null}
-
-                    <p
-                      className="text-sm text-light-font py-4"
-                      dangerouslySetInnerHTML={createMarkup(
-                        propiedad?.descripcion
-                      )}
-                    ></p>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="boxContain">
-                  <div className="w-full">
-                    <h1
-                      style={{
-                        color: settings.color_primary,
-                        borderColor: settings.color_primary,
-                      }}
-                      className=" font-bold text-lg pb-1 border-b-2  w-full"
-                    >
-                      Información del proyecto
-                    </h1>
-                    <div
-                      style={{ borderColor: settings.color_primary }}
-                      className="w-full p-2 border-2 mt-4"
-                    >
-                      <table>
-                        <tbody className="text-xs">
-                          <tr>
-                            <td
-                              className="px-[14px]"
-                              style={{ width: "175px" }}
-                            >
-                              <strong>Tipo de inmueble</strong>
-                            </td>
-                            <td className="px-[14px]">{propiedad.tipo}</td>
-                          </tr>
-
-                          <tr>
-                            <td
-                              className="px-[14px]"
-                              style={{ width: "175px" }}
-                            >
-                              <strong>Área total</strong>
-                            </td>
-                            <td className="px-[14px]">
-                              {propiedad.area_from} m2
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              className="px-[14px]"
-                              style={{ width: "175px" }}
-                            >
-                              <strong>Dormitorios</strong>
-                            </td>
-                            <td className="px-[14px]">{propiedad.habs}</td>
-                          </tr>
-                          <tr>
-                            <td
-                              className="px-[14px]"
-                              style={{ width: "175px" }}
-                            >
-                              <strong>Etapa del proyecto</strong>
-                            </td>
-                            <td className="px-[14px]">{propiedad.etapa}</td>
-                          </tr>
-                          <tr>
-                            <td
-                              className="px-[14px]"
-                              style={{ width: "175px" }}
-                            >
-                              <strong>Fecha de entrega</strong>
-                            </td>
-                            <td className="px-[14px]">
-                              {dayjs(propiedad.fecha_entrega).format(
-                                "DD [de] MMMM, YYYY"
-                              )}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td
-                              className="px-[14px]"
-                              style={{ width: "175px" }}
-                            >
-                              <strong>Financiamiento</strong>
-                            </td>
-                            <td className="px-[14px]">
-                              {propiedad.financiamiento === 1 ? "SI" : "NO"}
-                            </td>
-                          </tr>
-                          <tr className="Project-inmobiliaria">
-                            <td style={{ width: "175PX", textAlign: "center" }}>
-                              <figure className="Project-inmobiliaria__logo">
-                                <a className="h-12" href="/">
-                                  <img
-                                    className="h-full"
-                                    alt="logo inmobiliario"
-                                    src={businessData?.logo}
-                                  />
-                                </a>
-                              </figure>
-                            </td>
-                            <td className="px-[14px]">
-                              <div className="Project-inmobiliaria__name">
-                                <h2>{businessData?.nombre_razon}</h2>
-                                <div className="bx-link-go">
-                                  <Link
-                                    className="text-sm font-bold flex gap-2"
-                                    to={
-                                      "/busqueda/venta-de-departemento-o-casa-o-oficina-o-lote"
-                                    }
-                                  >
-                                    Ver otros proyectos&gt;
-                                  </Link>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-                <div className="boxContain">
-                  <div className="w-full">
-                    <h1
-                      style={{
-                        color: settings.color_primary,
-                        borderColor: settings.color_primary,
-                      }}
-                      className=" font-bold text-lg pb-1 border-b-2  w-full"
-                    >
-                      Áreas comunes
-                    </h1>
-                    <ul className="text-sm text-light-font grid grid-cols-2 gap-2 mt-4">
-                      {amenidades.map((amenidad, index) => {
-                        return <li key={index}>{amenidad.amenidad}</li>;
-                      })}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              {modelos.length > 0 ? (
-                <div className="boxContain">
-                  <div className="w-full">
-                    <h1
-                      style={{
-                        color: settings.color_primary,
-                        borderColor: settings.color_primary,
-                      }}
-                      className=" font-bold text-lg pb-1 border-b-2  w-full"
-                    >
-                      Modelos de {propiedad.tipo}
-                    </h1>
-                    <div className="w-full">
-                      <div className="max-h-[620px] overflow-y-auto divide-y-2 flex flex-col gap-4">
-                        {modelos
-                          .filter(
-                            (model) => model.cantidad_unidades_disponibles > 0
-                          )
-                          .map((model, index) => (
-                            <div
-                              key={index}
-                              className="w-full py-4 grid grid-cols-6 gap-3"
-                            >
-                              <div className="w-full">
-                                <img
-                                  className="w-full"
-                                  src={model.imagenUrl}
-                                  alt=""
-                                />
-                              </div>
-                              <div className="col-span-4 w-full">
-                                <div className="w-full top-info overflow-x-auto flex flex-wrap mb-4">
-                                  <span className="px-4 text-sm md:w-[34%]">
-                                    Modelo
-                                  </span>
-                                  {model.habs === 0 ? null : (
-                                    <span className="px-4 text-sm md:w-[14%]">
-                                      Dorm.
-                                    </span>
-                                  )}
-                                  {model.banios === 0 ? null : (
-                                    <span className="px-4 text-sm md:w-[14%]">
-                                      Baños
-                                    </span>
-                                  )}
-                                  {Number(model.garage) === 0 ? null : (
-                                    <span className="px-4 text-sm md:w-[14%]">
-                                      Garage
-                                    </span>
-                                  )}
-                                  <span className="px-4 text-sm md:w-[19%]">
-                                    Area
-                                  </span>
-                                  <span className="px-4 text-sm md:w-[28%]">
-                                    Precio desde
-                                  </span>
-                                </div>
-                                <div className="w-full bottom-info overflow-x-auto flex flex-wrap">
-                                  <span className="px-4 text-sm font-bold md:w-[34%]">
-                                    {model.nombre}
-                                  </span>
-                                  {model.habs === 0 ? null : (
-                                    <span className="px-4 text-sm font-bold md:w-[14%]">
-                                      {model.habs}
-                                    </span>
-                                  )}
-                                  {model.banios === 0 ? null : (
-                                    <span className="px-4 text-sm font-bold md:w-[14%]">
-                                      {model.banios}
-                                    </span>
-                                  )}
-                                  {Number(model.garage) === 0 ? null : (
-                                    <span className="px-4 text-sm font-bold md:w-[14%]">
-                                      {Number(model.garage) === 1 ? "SI" : "NO"}
-                                    </span>
-                                  )}
-                                  <span className="px-4 text-sm font-bold md:w-[19%]">
-                                    {model.area} m2
-                                  </span>
-                                  <span className="px-4 text-sm font-bold md:w-[28%]">
-                                    {model.moneda === "DOLLAR"
-                                      ? model.precio
-                                      : null}{" "}
-                                    {model.moneda === "DOLLAR" ? "$" : "S/"}{" "}
-                                    {model.moneda === "PEN"
-                                      ? model.precio
-                                      : null}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="w-full">
-                                <button
-                                  style={{
-                                    background: settings.color_primary,
-                                  }}
-                                  className="rounded font-bold text-white p-2 text-sm"
-                                >
-                                  Cotizar {model.cantidad_unidades_disponibles}{" "}
-                                  unidades
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-
-              <div className="boxContain">
-                <div className="w-full">
-                  <h1
-                    style={{
-                      color: settings.color_primary,
-                      borderColor: settings.color_primary,
-                    }}
-                    className=" text-center font-bold text-lg pb-1 border-b-2  w-full"
-                  >
-                    Plano de ubicación
-                  </h1>
-                  <div className="w-full mt-4 relative z-10">
-                    <MapContainer
-                      center={position}
-                      zoom={17}
-                      className={`h-[200px] md:h-[450px] w-full`}
-                      ref={mapRef}
-                    >
-                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-                      <Marker position={position}>
-                        <Popup>Propiedades: 1</Popup>
-                      </Marker>
-                    </MapContainer>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="sticky top-[80px] w-full md:col-span-4 p-4 rounded border border-gray-600 h-max">
-              <h1 className="mb-4 text-lg font-bold text-bold-font">
-                Contáctate con {businessData?.nombre_razon}, por la propiedad{" "}
-                {propiedad.nombre}
-              </h1>
-              <div
-                className="form  w-full grid grid-cols-1
-              gap-2"
-              >
-                <div className="group">
-                  <label
-                    className="text-sm font-medium text-bold-font"
-                    htmlFor=""
-                  >
-                    Correo electronico
-                  </label>
-                  <input
-                    value={dataCliente.email}
-                    onChange={(e) => handleCliente(e.target.value, "email")}
-                    type="email"
-                    className="w-full p-3 rounded bg-gray-200 text-sm"
-                  />
-                </div>
-                <div className="group">
-                  <label
-                    className="text-sm font-medium text-bold-font"
-                    htmlFor=""
-                  >
-                    Ingresa tus nombres
-                  </label>
-                  <input
-                    value={dataCliente.nombres}
-                    onChange={(e) => handleCliente(e.target.value, "nombres")}
-                    type="text"
-                    className="w-full p-3 rounded bg-gray-200 text-sm"
-                  />
-                </div>
-                <div className="group">
-                  <label
-                    className="text-sm font-medium text-bold-font"
-                    htmlFor=""
-                  >
-                    Ingresa tus apellidos
-                  </label>
-                  <input
-                    value={dataCliente.apellidos}
-                    onChange={(e) => handleCliente(e.target.value, "apellidos")}
-                    type="text"
-                    className="w-full p-3 rounded bg-gray-200 text-sm"
-                  />
-                </div>
-                <div className="group">
-                  <label
-                    className="text-sm font-medium text-bold-font"
-                    htmlFor=""
-                  >
-                    Celular
-                  </label>
-                  <input
-                    value={dataCliente.celular}
-                    onChange={(e) => handleCliente(e.target.value, "celular")}
-                    type="text"
-                    className="w-full p-3 rounded bg-gray-200 text-sm"
-                  />
-                </div>
-                <div className="group">
-                  <label
-                    className="text-sm font-medium text-bold-font"
-                    htmlFor=""
-                  >
-                    Mensaje
-                  </label>
-                  <textarea
-                    value={dataCliente.mensaje}
-                    onChange={(e) => handleCliente(e.target.value, "mensaje")}
-                    className="w-full p-3 rounded bg-gray-200 text-sm"
-                  />
-                </div>
-                <div className="buttton">
-                  <p className="text-sm text-light-font">Enviar mensaje por:</p>
-                  <button
-                    style={{
-                      background: settings.color_primary,
-                    }}
-                    onClick={(e) => handleSendContact(e, "whatsapp")}
-                    className="w-full p-3 rounded-full  text-white text-sm flex items-center justify-center gap-3"
-                  >
-                    <FaWhatsapp className="text-xl" /> Contactar por WhatsApp
-                  </button>
-
-                  <button
-                    onClick={(e) => handleSendContact(e, "telefono")}
-                    className="w-full p-3 rounded-full bg-gray-200 text-bold-font text-sm mt-4 flex items-center justify-center gap-3"
-                  >
-                    <FaPhoneAlt className="text-xl" /> Llamar{" "}
-                    {businessData?.phone_contact}
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
+        </>
+      ) : (
+        <div className="z-50 top-0 left-0 right-0 fixed bottom-0 w-full h-full bg-dark-purple flex items-center justify-center text-white text-2xl">
+          Cargando...
         </div>
-        <div className="bg-[#f3f4f6] py-[40px] w-full">
-          <div className="max-w-[1170px] mx-auto">
-            <h1
-              style={{
-                color: settings.color_primary,
-              }}
-              className="text-2xl font-bold mb-4"
-            >
-              Otros proyectos que podrian interesarte
-            </h1>
-            {properties.length > 0 ? (
-              <ListPropiedadesPage
-                settings={settings}
-                propiedades={properties}
-              />
-            ) : null}
-          </div>
-        </div>
-      </div>
+      )}
     </>
   );
 };
