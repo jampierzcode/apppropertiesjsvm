@@ -75,7 +75,7 @@ const NavigationPage = () => {
   return (
     <header className="shadow fixed z-40 top-0 left-0 w-full bg-white">
       <div className="flex items-center justify-between  px-5 py-3 max-w-[1350px] mx-auto">
-        <div className="logo w-[25%]">
+        <div className="logo w-[70%] md:w-[25%] ">
           <Link to={"/"}>
             <img title={`${businessData.nombre_razon}`} loading="lazy"
               className="w-[90%] md:w-[70%] object-contain object-left"
