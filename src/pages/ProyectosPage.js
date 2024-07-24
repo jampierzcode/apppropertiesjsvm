@@ -261,11 +261,33 @@ const ProyectosPage = () => {
               content={`${propiedad.purpose} de ${propiedad.tipo} -  Proyecto ${propiedad?.nombre} en ${propiedad?.exactAddress}, ${propiedad?.distrito_name} ${propiedad?.provincia_name} ${propiedad?.region_name}`}
             />
             <meta property="og:description" content={propiedad?.descripcion} />
-            <meta property="og:image" content={`${propiedad.logo}`} />
+            <meta
+              property="og:image"
+              content={`${
+                propiedad.logo === "" || propiedad.logo === null
+                  ? window.location.origin + "/logo3.png"
+                  : propiedad.logo
+              }`}
+            />
             <meta property="og:url" content={window.location.href} />
             <meta property="og:type" content="website" />
-            <link rel="canonical" href={`/proyectos/${propiedad.id}`} />
-            <link rel="icon" href={`${propiedad.logo}`} />
+            <link rel="canonical" href={window.location.href} />
+            <link
+              rel="icon"
+              href={`${
+                propiedad.logo === "" || propiedad.logo === null
+                  ? window.location.origin + "/logo3.png"
+                  : propiedad.logo
+              }`}
+            />
+            <link
+              rel="apple-touch-icon"
+              href={`${
+                propiedad.logo === "" || propiedad.logo === null
+                  ? window.location.origin + "/logo3.png"
+                  : propiedad.logo
+              }`}
+            />
           </Helmet>
           <div>
             <div className="max-w-[1170px] mx-auto px-3 pt-[120px] py-5">
@@ -460,7 +482,9 @@ const ProyectosPage = () => {
                               className="w-full h-[300px]"
                               id="urlvideoY"
                               src={obtenerCodigoVideo(
-                                propiedad ? "" : propiedad?.video_descripcion
+                                propiedad === null
+                                  ? ""
+                                  : propiedad?.video_descripcion
                               )}
                               title="YouTube video player"
                               frameBorder="0"

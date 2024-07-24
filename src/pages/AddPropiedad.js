@@ -878,7 +878,7 @@ const AddPropiedad = () => {
                 <textarea
                   value={descripcionPropiedad}
                   onChange={(e) => setDescripcionPropiedad(e.target.value)}
-                  maxLength={255}
+                  maxLength={2000}
                   cols={4}
                   rows={4}
                   type="text"

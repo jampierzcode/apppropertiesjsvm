@@ -4,6 +4,7 @@ import axios from "axios";
 import { Select, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSharedData } from "../components/SharedDataContext";
+import { Helmet } from "react-helmet-async";
 const { Option } = Select;
 const Home = () => {
   const sharedData = useSharedData();
@@ -106,6 +107,20 @@ const Home = () => {
 
   return (
     <>
+      <Helmet>
+        <link rel="canonical" href="/" />
+        <meta property="og:title" content="Tu vivienda" />
+        <meta property="og:image" content="%PUBLIC_URL%/logo2.png" />
+        <meta
+          property="og:description"
+          content="La propiedad que buscas a un click"
+        />
+        <meta
+          property="og:url"
+          content="https://tuvivienda.tuviviendaya.com/"
+        />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <div
         className="w-full h-[95vh] relative"
         style={{
