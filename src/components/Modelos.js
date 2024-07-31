@@ -87,59 +87,6 @@ const Modelos = ({ models, setModels }) => {
     setModels((prevModels) => prevModels.filter((_, i) => i !== index));
   };
 
-  const session = JSON.parse(sessionStorage.getItem("session"));
-
-  const handleUploadModels = async () => {
-    const token = session.token;
-    console.log(models);
-    try {
-      const formData = new FormData();
-      formData.append(`propertyName`, "nombre-propiedad");
-      models.forEach((model, index) => {
-        // formData.append(`model[${index}][categoria]`, model.categoria);
-        // formData.append(`model[${index}][nombre]`, model.nombre);
-        // formData.append(`model[${index}][precio]`, model.precio);
-        // formData.append(`model[${index}][area]`, model.area);
-        if (model.imagenUrl) {
-          const file = dataURLtoFile(model.imagenUrl, `image${index}.jpg`);
-          formData.append(`modelosImages[${index}]`, model.imagen);
-        }
-        // model.unidades.forEach((unit, unitIndex) => {
-        //   formData.append(
-        //     `model[${index}][unidades][${unitIndex}][nombre]`,
-        //     unit.nombre
-        //   );
-        // });
-      });
-
-      const response = await axios.post(
-        "http://localhost/apipropiedades/api/uploadimg",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const dataURLtoFile = (dataurl, filename) => {
-    const arr = dataurl.split(",");
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  };
 
   return (
     <div className="boxPropie mb-6">

@@ -2,19 +2,13 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import {
   FaFacebook,
-  FaMailBulk,
   FaTwitter,
-  FaVoicemail,
   FaWhatsapp,
 } from "react-icons/fa";
-import { FaMailchimp } from "react-icons/fa6";
 import {
   IoLocation,
-  IoLocationOutline,
   IoMail,
-  IoMailOutline,
   IoPhonePortrait,
-  IoPhonePortraitOutline,
 } from "react-icons/io5";
 import { useSharedData } from "./SharedDataContext";
 
@@ -55,33 +49,7 @@ const FooterPage = () => {
   useEffect(() => {
     fetchBusinessData();
   }, [0]);
-  const menu = [
-    {
-      icon: "-",
-      name: "Home",
-      url: "/",
-    },
-    {
-      icon: "-",
-      name: "Departamentos",
-      url: "/busqueda/venta-de-departamento",
-    },
-    {
-      icon: "-",
-      name: "Casas",
-      url: "/busqueda/venta-de-casa",
-    },
-    {
-      icon: "-",
-      name: "Oficinas",
-      url: "/busqueda/venta-de-oficina",
-    },
-    {
-      icon: "-",
-      name: "Lotes",
-      url: "/busqueda/venta-de-lote",
-    },
-  ];
+  
   // compartir botones
   const shareOnFacebook = () => {
     const url =

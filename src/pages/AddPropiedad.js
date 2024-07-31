@@ -10,7 +10,7 @@ import { BsBoundingBoxCircles } from "react-icons/bs";
 import Amenities from "../components/Amenities";
 import Modelos from "../components/Modelos";
 import dayjs from "dayjs";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LogoUpload from "../components/LogoUpload";
 
 const AddPropiedad = () => {
@@ -89,7 +89,7 @@ const AddPropiedad = () => {
       }
     };
     fetchProvinces();
-  }, []);
+  }, [apiUrl, session.token]);
   const handleProvinceChange = async (e) => {
     console.log(e);
 
@@ -186,10 +186,6 @@ const AddPropiedad = () => {
     fetchCoordinates();
   }, [address]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setAddress({ ...address, [name]: value });
-  };
 
   const handleLocate = () => {
     // Lógica para actualizar la posición basándose en la dirección proporcionada
@@ -333,7 +329,6 @@ const AddPropiedad = () => {
     return new Promise(async (resolve, reject) => {
       const token = session.token;
       const formData = new FormData();
-      const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
 
       formData.append("propertyName", "covers");
       if (coverImage) {
@@ -361,7 +356,6 @@ const AddPropiedad = () => {
     return new Promise(async (resolve, reject) => {
       const token = session.token;
       const formData = new FormData();
-      const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
 
       formData.append("propertyName", "gallery");
 
@@ -390,7 +384,6 @@ const AddPropiedad = () => {
     return new Promise(async (resolve, reject) => {
       const token = session.token;
       const formData = new FormData();
-      const propertyName = nombrePropiedad; // Asume que este valor lo obtienes de algún input o estado
 
       formData.append("propertyName", "modelos");
 

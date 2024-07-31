@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ListPropiedadesPage from "../components/ListPropiedadesPage";
 import axios from "axios";
-import { Select, message } from "antd";
+import { Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSharedData } from "../components/SharedDataContext";
 import { Helmet } from "react-helmet-async";

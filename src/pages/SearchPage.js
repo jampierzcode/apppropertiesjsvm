@@ -250,7 +250,6 @@ const SearchPage = () => {
     minPrice === null ? 0 : minPrice,
     maxPrice === null ? Infinity : maxPrice,
   ]);
-  const [selectedCurrency, setSelectedCurrency] = useState(currency || null);
 
   const buscarPropiedades = async () => {
     try {

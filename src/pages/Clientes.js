@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
-import { Button, DatePicker, Dropdown, Input, Select } from "antd";
-import { MdAdd, MdOutlineHomeWork } from "react-icons/md";
-import { TbAdjustments, TbCaretDownFilled } from "react-icons/tb";
-import { NavLink } from "react-router-dom";
+import { Button, Dropdown, Select } from "antd";
+import { TbCaretDownFilled } from "react-icons/tb";
 import { AiOutlineSearch } from "react-icons/ai";
 import axios from "axios";
-import dayjs from "dayjs";
 import { FaFileExcel, FaUsers } from "react-icons/fa";
-const { Option } = Select;
-const { RangePicker } = DatePicker;
 const Clientes = () => {
   const session = JSON.parse(sessionStorage.getItem("session"));
   const apiUrl = process.env.REACT_APP_API_URL;

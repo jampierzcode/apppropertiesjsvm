@@ -102,7 +102,6 @@ const ConfigWebSite = () => {
   const handleSave = async () => {
     const token = session.token;
     const uploadImageUrl = `${apiUrl}/businessimg`;
-    const updateBusinessUrl = `${apiUrl}/business`;
 
     const { portada, ...webInfo } = webData;
 
@@ -223,6 +222,7 @@ const ConfigWebSite = () => {
           // Logo changed
           if (initialData.portada !== "") {
             const delete_logo = await deletePortada(initialData.portada);
+            console.log(delete_logo)
           }
           const imageUrl = await uploadPortada(portadaFile);
           const response = await updateWebData({

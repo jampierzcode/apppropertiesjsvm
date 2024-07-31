@@ -5,7 +5,7 @@ import { MdNumbers } from "react-icons/md";
 import MapComponent from "../components/MapComponent";
 import axios from "axios";
 import { Select, Switch, message } from "antd";
-import { FaCalendar, FaTimes } from "react-icons/fa";
+import { FaCalendar } from "react-icons/fa";
 import { BsBoundingBoxCircles } from "react-icons/bs";
 import { useParams } from "react-router-dom";
 import AmenitiesEdit from "../components/AmenitiesEdit";
@@ -28,9 +28,6 @@ const EditPropiedad = () => {
   // ESTADOS DE DATOS BASICOS propiedad amenidades
   const [amenidades, setAmenidades] = useState([]);
   const [initialAmenidades, setInitialAmenidades] = useState([]);
-  // ESTADOS DE DATOS BASICOS propiedad multimedia
-  const [multimedia, setMultimedia] = useState([]);
-  const [initialMultimedia, setInitialMultimedia] = useState([]);
 
   useEffect(() => {
     setLoadingCreate(true);
@@ -425,6 +422,7 @@ const EditPropiedad = () => {
       // Logo changed
       if (initialData.logo !== "" && initialData.logo !== null) {
         const delete_logo = await deleteLogo(initialData.logo);
+        console.log(delete_logo)
       }
       const imageUrl = await uploadLogo(logoFilePropiedad);
       const response = await updateInfoPropiedad({

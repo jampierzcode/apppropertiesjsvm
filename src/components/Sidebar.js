@@ -7,7 +7,6 @@ import {
   IoBusinessOutline,
   IoPeopleOutline,
   IoSettingsOutline,
-  IoSpeedometerOutline,
 } from "react-icons/io5";
 
 const Sidebar = ({ open, setOpen }) => {

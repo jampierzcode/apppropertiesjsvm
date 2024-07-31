@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import LogoUpload from "./LogoUpload";
 import InputField from "./InputField";
-import { message, Space, ColorPicker } from "antd";
+import { message } from "antd";
 
 const BusinessForm = () => {
   // estados funcionales
@@ -78,7 +78,6 @@ const BusinessForm = () => {
   const handleSave = async () => {
     const token = session.token;
     const uploadImageUrl = `${apiUrl}/businessimg`;
-    const updateBusinessUrl = `${apiUrl}/business`;
 
     const { logo, ...businessInfo } = businessData;
 
@@ -195,6 +194,7 @@ const BusinessForm = () => {
           // Logo changed
           if (initialData.logo !== "") {
             const delete_logo = await deleteLogo(initialData.logo);
+            console.log(delete_logo)
           }
           const imageUrl = await uploadLogo(logoFile);
           const response = await updateBusinessData({

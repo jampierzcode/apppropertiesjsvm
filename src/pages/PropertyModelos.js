@@ -6,7 +6,7 @@ import { FaEdit, FaEllipsisV, FaTrash } from "react-icons/fa";
 import { FaStrava } from "react-icons/fa6";
 import { MdAdd } from "react-icons/md";
 import { TbAdjustments, TbCaretDownFilled } from "react-icons/tb";
-import { NavLink, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import LogoUpload from "../components/LogoUpload";
 import { BsViewList } from "react-icons/bs";
 
@@ -462,6 +462,7 @@ const PropertyModelos = () => {
         // Logo changed
         if (initialModeloAtivo.imagenUrl !== "") {
           const delete_logo = await deleteLogo(initialModeloAtivo.imagenUrl);
+          console.log(delete_logo)
         }
         const imageUrl = await uploadLogo(logoFile);
         const response = await updateInfoModelo({
