@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, DatePicker, Dropdown, Input, Select, Space } from "antd";
+import {
+  Button,
+  DatePicker,
+  Dropdown,
+  Input,
+  message,
+  Modal,
+  Select,
+  Space,
+} from "antd";
 import { MdAdd } from "react-icons/md";
 import { TbAdjustments, TbCaretDownFilled } from "react-icons/tb";
 import { Link, NavLink } from "react-router-dom";
@@ -162,7 +171,8 @@ const Propiedades = () => {
     applyFilters(); // Aplicar filtro inicialmente
   }, [filterPropiedades, currentPage, itemsPerPage, searchTerm]);
 
-  const handleSelect = (id) => {
+  const handleSelect = (e, id) => {
+    e.stopPropagation();
     setSelectsProperties((prevSelects) => {
       if (prevSelects.includes(id)) {
         return prevSelects.filter((p) => p !== id);
@@ -235,9 +245,30 @@ const Propiedades = () => {
     e.stopPropagation();
     console.log(id);
   };
-  const handleEliminarProperty = (e, id) => {
-    e.stopPropagation();
+  const eliminar_property = (propiedad_id) => {
+    return new Promise(async (resolve, reject) => {
+      const response = await axios.delete(
+        `${apiUrl}/propiedades/${propiedad_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.token}`,
+          },
+        }
+      );
+      console.log(response);
+      resolve(response.data);
+    });
+  };
+  const handleEliminarProperty = async (id) => {
     console.log(id);
+    let propiedad_id = id;
+    try {
+      const response = await eliminar_property(propiedad_id);
+      buscarPropiedades();
+      message.success("Se elimino correctamente la propiedad");
+    } catch (error) {
+      message.error("No se elimino la propiedad, hubo un error");
+    }
   };
 
   return (
@@ -441,16 +472,18 @@ const Propiedades = () => {
                   <tr
                     className=""
                     key={index}
-                    onClick={() => handleSelect(propiedad.id)}
+                    onClick={(e) => handleSelect(e, propiedad.id)}
                   >
                     <td className="check-field">
                       <input
                         type="checkbox"
-                        value={propiedad.id}
+                        value={propiedad.id || ""}
                         onClick={(e) => handleCheckSelect(e, propiedad.id)}
                         checked={selectsProperties.find((s) => {
                           if (s === propiedad.id) {
                             return true;
+                          } else {
+                            return false;
                           }
                         })}
                       />
@@ -543,14 +576,23 @@ const Propiedades = () => {
                               },
                               {
                                 label: (
-                                  <div
-                                    className="pr-6 rounded flex items-center gap-2 text-sm text-gray-500 text-red-500 "
-                                    onClick={(e) =>
-                                      handleEliminarProperty(e, propiedad.id)
-                                    }
+                                  <button
+                                    onClick={() => {
+                                      Modal.confirm({
+                                        title:
+                                          "¿Está seguro de eliminar la propiedad?",
+                                        content:
+                                          "Al eliminar la propiedad, se eliminarán los datos relacionados con la propiedad como: modelos, unidades y contenido multimedia",
+                                        onOk: () =>
+                                          handleEliminarProperty(propiedad.id),
+                                        okText: "Eliminar",
+                                        cancelText: "Cancelar",
+                                      });
+                                    }}
+                                    className="w-full pr-6 p-2 rounded flex items-center gap-2 text-sm text-red-500"
                                   >
                                     <FaTrash /> Eliminar
-                                  </div>
+                                  </button>
                                 ),
                                 key: 2,
                               },
