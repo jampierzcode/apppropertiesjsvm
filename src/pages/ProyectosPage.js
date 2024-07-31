@@ -15,11 +15,10 @@ import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import { Link, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 import { message } from "antd";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import ListPropiedadesPage from "../components/ListPropiedadesPage";
 import { useSharedData } from "../components/SharedDataContext";
-import { FaPhone, FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
-import { FaPhoneFlip } from "react-icons/fa6";
+import { FaPhoneAlt, FaWhatsapp } from "react-icons/fa";
 import { Helmet } from "react-helmet-async";
 
 const ProyectosPage = () => {
