@@ -17,6 +17,7 @@ import ProyectosPage from "./pages/ProyectosPage";
 import EditPropiedad from "./pages/EditPropiedad";
 import PropertyModelos from "./pages/PropertyModelos";
 import PropertyMultimedia from "./pages/PropertyMultimedia";
+import Cotizar from "./pages/Cotizar";
 
 function App() {
   return (
@@ -73,6 +74,14 @@ function App() {
           element={
             <LayoutPages>
               <ProyectosPage />
+            </LayoutPages>
+          }
+        />
+        <Route
+          path="/cotizar/:proyectoId/model/:modelId"
+          element={
+            <LayoutPages>
+              <Cotizar />
             </LayoutPages>
           }
         />

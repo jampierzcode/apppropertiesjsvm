@@ -108,9 +108,18 @@ const Home = () => {
   return (
     <>
       <Helmet>
+        <link rel="icon" href={`${window.location.origin + "/logo3.png"}`} />
+        <meta name="theme-color" content="#000" />
+        <link rel="apple-touch-icon" href={`${window.location.origin + "/logo3.png"}`} />
+      
         <link rel="canonical" href="/" />
         <meta property="og:title" content="Tu vivienda" />
-        <meta property="og:image" content="%PUBLIC_URL%/logo2.png" />
+        <meta property="og:image" content={`${window.location.origin + "/logo3.png"}`} />
+        <meta
+          name="description"
+          data-rh="true"
+          content="La propiedad que buscas a un click"
+        />
         <meta
           property="og:description"
           content="La propiedad que buscas a un click"

@@ -462,7 +462,7 @@ const PropertyModelos = () => {
         // Logo changed
         if (initialModeloAtivo.imagenUrl !== "") {
           const delete_logo = await deleteLogo(initialModeloAtivo.imagenUrl);
-          console.log(delete_logo)
+          console.log(delete_logo);
         }
         const imageUrl = await uploadLogo(logoFile);
         const response = await updateInfoModelo({
@@ -528,11 +528,10 @@ const PropertyModelos = () => {
     setNumberUnidades(0);
     setPrefijo("");
   };
-  const handleUnitChange = (unitIndex, value) => {
-    const updateUnidades = unidades.map((unidad, i) =>
-      i === unitIndex ? { ...unidad, nombre: value } : unidad
-    );
-    setUnidades(updateUnidades);
+  const handleUnitChange = (key, value, index) => {
+    const newUnidades = [...unidades];
+    newUnidades[index][key] = value;
+    setUnidades(newUnidades);
   };
 
   return (
@@ -957,7 +956,9 @@ const PropertyModelos = () => {
                   className="bg-gray-200 rounded px-3 py-2 w-full text-sm"
                   type="text"
                   value={unit.nombre}
-                  onChange={(e) => handleUnitChange(unitIndex, e.target.value)}
+                  onChange={(e) =>
+                    handleUnitChange("nombre", e.target.value, unitIndex)
+                  }
                 />
               </div>
               <div className="w-full">
@@ -969,7 +970,9 @@ const PropertyModelos = () => {
                   name=""
                   id="unidades"
                   value={unit.status}
-                  onChange={(e) => handleUnitChange(unitIndex, e.target.value)}
+                  onChange={(e) =>
+                    handleUnitChange("status", e.target.value, unitIndex)
+                  }
                 >
                   <option value="Disponible">Disponible</option>
                   <option value="Separado">Separado</option>

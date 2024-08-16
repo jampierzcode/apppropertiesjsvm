@@ -662,7 +662,7 @@ const ProyectosPage = () => {
                               .map((model, index) => (
                                 <div
                                   key={index}
-                                  className="w-full py-4 grid grid-cols-6 gap-3"
+                                  className="w-full py-4 grid grid-cols-5 gap-3"
                                 >
                                   <div className="w-full">
                                     <img
@@ -671,17 +671,17 @@ const ProyectosPage = () => {
                                       alt=""
                                     />
                                   </div>
-                                  <div className="col-span-4 w-full">
+                                  <div className="col-span-3 w-full">
                                     <div className="w-full top-info overflow-x-auto flex flex-wrap mb-4">
                                       <span className="px-4 text-sm md:w-[34%]">
                                         Modelo
                                       </span>
-                                      {model.habs === 0 ? null : (
+                                      {Number(model.habs) === 0 ? null : (
                                         <span className="px-4 text-sm md:w-[14%]">
                                           Dorm.
                                         </span>
                                       )}
-                                      {model.banios === 0 ? null : (
+                                      {Number(model.banios) === 0 ? null : (
                                         <span className="px-4 text-sm md:w-[14%]">
                                           Baños
                                         </span>
@@ -692,7 +692,7 @@ const ProyectosPage = () => {
                                         </span>
                                       )}
                                       <span className="px-4 text-sm md:w-[19%]">
-                                        Area
+                                        Area desde
                                       </span>
                                       <span className="px-4 text-sm md:w-[28%]">
                                         Precio desde
@@ -702,12 +702,12 @@ const ProyectosPage = () => {
                                       <span className="px-4 text-sm font-bold md:w-[34%]">
                                         {model.nombre}
                                       </span>
-                                      {model.habs === 0 ? null : (
+                                      {Number(model.habs) === 0 ? null : (
                                         <span className="px-4 text-sm font-bold md:w-[14%]">
                                           {model.habs}
                                         </span>
                                       )}
-                                      {model.banios === 0 ? null : (
+                                      {Number(model.banios) === 0 ? null : (
                                         <span className="px-4 text-sm font-bold md:w-[14%]">
                                           {model.banios}
                                         </span>
@@ -734,16 +734,18 @@ const ProyectosPage = () => {
                                     </div>
                                   </div>
                                   <div className="w-full">
-                                    <button
+                                    <Link
+                                      to={`/cotizar/${query}/model/${model.id}`}
                                       style={{
                                         background: settings.color_primary,
                                       }}
-                                      className="rounded font-bold text-white p-2 text-sm"
+                                      className="rounded font-bold text-white p-2 text-sm whitespace-nowrap flex items-center text-center"
                                     >
-                                      Cotizar{" "}
+                                      ¡COTIZAR AHORA! <br />
+                                      {"("}Ver{" "}
                                       {model.cantidad_unidades_disponibles}{" "}
-                                      unidades
-                                    </button>
+                                      unidades{")"}
+                                    </Link>
                                   </div>
                                 </div>
                               ))}
